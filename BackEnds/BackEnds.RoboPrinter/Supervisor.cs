@@ -1,14 +1,16 @@
-﻿using Entities;
+﻿#region Imports
+
+using BackEnds.RoboPrinter.RobotModels;
+using BackEnds.RoboPrinter.Services;
+using BackEnds.RoboPrinter.Services.IServices;
+using Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using BackEnds.RoboPrinter.RobotModels;
-using BackEnds.RoboPrinter.Services.IServices;
-using UseCases.core;
 using Microsoft.Extensions.Logging;
-using BackEnds.RoboPrinter.Services;
 using System.Net.NetworkInformation;
-using static BackEnds.RoboPrinter.SD;
+using UseCases.core;
 
+#endregion
 
 namespace BackEnds.RoboPrinter;
 
@@ -25,7 +27,6 @@ public class Supervisor : IHostedService
     private readonly ICycleService _cycleService;
     private int _activeOperativeModeId;
     private string _currentSerialNumber = string.Empty;
-    private int _activeProduct = 0;
     private bool _areDigitalIOSignalsEnabled = false;
     private bool _executeEntireCycleEnabled = false;
     private string _pendingLabelToPrint = string.Empty;
@@ -50,7 +51,7 @@ public class Supervisor : IHostedService
         _activeOperativeModeId = await _viewModel.GetActiveOperativeMode();
         _areDigitalIOSignalsEnabled = await _viewModel.GetDigitalIOSignalsConfiguration();
         _executeEntireCycleEnabled = await _viewModel.GetCycleConfiguration();
-        _activeProduct = await _viewModel.GetActiveProduct();
+        await _viewModel.GetActiveProduct();
         await InitializeRobot();
         _printerService.Connect(_configuration["InternalDevices:Printer:IpAddress"], Convert.ToInt16(_configuration["InternalDevices:Printer:Port"]), Convert.ToBoolean(_configuration["InternalDevices:Robot:DebugMode"]));
         InitializeExternalDevice();
@@ -97,8 +98,11 @@ public class Supervisor : IHostedService
 
         _externalDevice.PrintRequested += OnCSEPrintRequested;
         _externalDevice.ResetRequested += OnResetRequested;
+        _externalDevice.StatusRequested += OnStatusRequested;
         _externalDevice.DirectMessageToPrinterRequested += OnDirectMessageToPrinterRequested;
         _externalDevice.UpdateSerialNumberRequested += OnUpdateSerialNumberRequested;
+        _externalDevice.LoadProductRequested += OnLoadProductRequested;
+        _externalDevice.Load(_activeOperativeModeId);
         _externalDevice.Connect();
         _logger.LogInformation($"InitializeExternalDevice - connection completed");
     }
@@ -135,7 +139,7 @@ public class Supervisor : IHostedService
 
         _executeEntireCycleEnabled = await _viewModel.GetCycleConfiguration();
 
-        _logger.LogInformation("OnPrintRequested - Active OperativeMode: {OperativeMode}", (SD.OperativeModes)_activeOperativeModeId);
+        _logger.LogInformation("OnPrintRequested - Active OperativeMode: {OperativeMode}", (OperativeModes)_activeOperativeModeId);
 
         _activeOperativeModeId = await _viewModel.GetActiveOperativeMode();
 
@@ -143,9 +147,9 @@ public class Supervisor : IHostedService
         {
             _logger.LogInformation("OnPrintRequested - ActiveOperativeMode is manual!");
 
-            _activeProduct = await _viewModel.GetActiveProduct();
+            await _viewModel.GetActiveProduct();
 
-            var status = await _cycleService.ExecutePrintCycle(_activeProduct, "99999999", _activeOperativeModeId, string.Empty);
+            var status = await _cycleService.ExecutePrintCycle(_viewModel.ActiveProductId, "99999999", _activeOperativeModeId, string.Empty);
 
             if (status == OperationStatus.OK)
             {
@@ -153,7 +157,7 @@ public class Supervisor : IHostedService
 
                 if (_executeEntireCycleEnabled)
                 {
-                    var statusApply = await _cycleService.ExecuteApplyCycle(_activeProduct, "99999999", _activeOperativeModeId);
+                    var statusApply = await _cycleService.ExecuteApplyCycle(_viewModel.ActiveProductId, "99999999", _activeOperativeModeId);
 
                     if (statusApply == OperationStatus.OK)
                     {
@@ -198,7 +202,7 @@ public class Supervisor : IHostedService
         {
             _logger.LogInformation("OnApplyRequested - ActiveOperativeMode is manual!");
 
-            var statusApply = await _cycleService.ExecuteApplyCycle(_activeProduct, "99999999", _activeOperativeModeId);
+            var statusApply = await _cycleService.ExecuteApplyCycle(_viewModel.ActiveProductId, "99999999", _activeOperativeModeId);
 
             if (statusApply == OperationStatus.OK)
             {
@@ -207,7 +211,7 @@ public class Supervisor : IHostedService
             return;
         }
 
-        _logger.LogInformation("OnApplyRequested - Active OperativeMode: {OperativeMode}", (SD.OperativeModes)_activeOperativeModeId);
+        _logger.LogInformation("OnApplyRequested - Active OperativeMode: {OperativeMode}", (OperativeModes)_activeOperativeModeId);
         await ExecuteApplyCycle();
     }
 
@@ -268,6 +272,36 @@ public class Supervisor : IHostedService
         _currentSerialNumber = e.Content;
     }
 
+    private async void OnLoadProductRequested(object? sender, ExternalDeviceEventArgs e)
+    {
+        _logger.LogInformation("OnLoadProductRequested - Received ProductId {ProductId}...", e.Content);
+        
+        if (int.TryParse(e.Content, out int newProductId))
+        {
+            var product = await _viewModel.GetProductById(newProductId);
+
+            if (product is not null)
+            {
+                _logger.LogError("Found a Product with Id: {Id} - Updating ActiveProduct...", newProductId);
+                await _viewModel.SaveActiveProduct(newProductId);
+            }
+        }
+        else
+        {
+            var product = await _viewModel.GetProductByDescription(e.Content);
+
+            if (product is not null)
+            {
+                _logger.LogError("Found a Product with Description: {Description} - Updating ActiveProduct...", e.Content);
+                await _viewModel.SaveActiveProduct(product.Id);
+            }
+            else
+            {
+                _logger.LogError("Failed to find a Product with Id or Description equal to: {Product}", e.Content);
+            }
+        }
+    }
+
     private void OnHomePositionRequested(object? sender, EventArgs e)
     {
         _logger.LogInformation("OnHomePositionRequested");
@@ -294,14 +328,23 @@ public class Supervisor : IHostedService
         {
             _robotService.SetDigitalOutput((int)DigitalOutputs.PrinterLowMaterial, false);
         }
+    }
 
+    private void OnStatusRequested(object? sender, EventArgs e)
+    {
+        _logger.LogInformation("OnStatusRequested");
+        var printerStatus = _printerService.GetStatus();
+        var robotStatus = _robotService.Status;
+        var systemStatus = printerStatus == PrinterStatus.OK && (robotStatus == "Enabled" ||  robotStatus == "Running") ? SystemStatus.OK : SystemStatus.Error;
+        _logger.LogInformation("Printer Reset returned status: {PrinterStatus}", printerStatus);
+        _externalDevice.SendStatus(systemStatus);
     }
 
     #endregion
 
     private async Task<bool> ExecutePrintCycle()
     {
-        if (_activeProduct == 0)
+        if (_viewModel.ActiveProductId == 0)
         {
             _logger.LogInformation("ExecutePrintCycle - ActiveProduct is zero!");
             return false;
@@ -323,7 +366,7 @@ public class Supervisor : IHostedService
             }
         }
 
-        var status = await _cycleService.ExecutePrintCycle(_activeProduct, _currentSerialNumber, _activeOperativeModeId, _pendingLabelToPrint);
+        var status = await _cycleService.ExecutePrintCycle(_viewModel.ActiveProductId, _currentSerialNumber, _activeOperativeModeId, _pendingLabelToPrint);
         _pendingLabelToPrint = string.Empty;
         _ioExternalCommunication.LabelPrinted(status);
         return status == OperationStatus.OK;
@@ -331,7 +374,7 @@ public class Supervisor : IHostedService
 
     private async Task ExecuteApplyCycle()
     {
-        if (_activeProduct == 0)
+        if (_viewModel.ActiveProductId == 0)
         {
             _logger.LogInformation("ExecuteApplyCycle - ActiveProduct is zero!");
             return;
@@ -353,7 +396,7 @@ public class Supervisor : IHostedService
             }
         }
 
-        var status = await _cycleService.ExecuteApplyCycle(_activeProduct, _currentSerialNumber, _activeOperativeModeId);
+        var status = await _cycleService.ExecuteApplyCycle(_viewModel.ActiveProductId, _currentSerialNumber, _activeOperativeModeId);
         _pendingLabelToPrint = string.Empty;
         _ioExternalCommunication.LabelApplied(status);
     }

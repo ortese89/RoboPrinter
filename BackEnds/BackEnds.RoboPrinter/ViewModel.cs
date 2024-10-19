@@ -8,8 +8,18 @@ namespace BackEnds.RoboPrinter;
 
 public class ViewModel
 {
+    #region Private Properties
+
     private readonly ApplicationDbContext _context;
     private static readonly SemaphoreSlim _semaphore = new(1, 1);
+
+    #endregion
+
+    #region Public Properties
+
+    public int ActiveProductId = 0;
+
+    #endregion
 
     public ViewModel(ApplicationDbContext context)
     {
@@ -237,7 +247,8 @@ public class ViewModel
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Description == "ActiveProduct");
 
-            return Convert.ToInt16(appSetting?.Value);
+            ActiveProductId = Convert.ToInt16(appSetting?.Value);
+            return ActiveProductId;
         }
         finally
         {
@@ -399,6 +410,19 @@ public class ViewModel
         {
             return await _context.Products
                 .FirstOrDefaultAsync(x => x.Id == id);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+    public async Task<Product?> GetProductByDescription(string description)
+    {
+        await _semaphore.WaitAsync();
+        try
+        {
+            return await _context.Products
+                .FirstOrDefaultAsync(x => x.Description == description);
         }
         finally
         {
@@ -846,6 +870,7 @@ public class ViewModel
             {
                 appSetting.Value = activeProduct.ToString();
                 await _context.SaveChangesAsync();
+                ActiveProductId = activeProduct;
             }
         }
         finally

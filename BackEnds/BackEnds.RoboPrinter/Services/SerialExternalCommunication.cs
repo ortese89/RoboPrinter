@@ -68,7 +68,7 @@ public class SerialExternalCommunication : ExternalCommunicationBase
         _buffer.Clear();
     }
 
-    public override void SendStatus(OperationStatus status)
+    public override void SendStatus(SystemStatus status)
     {
         SendMessage(status.ToString());
     }

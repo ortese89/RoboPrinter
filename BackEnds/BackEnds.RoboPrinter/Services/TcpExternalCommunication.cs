@@ -36,6 +36,7 @@ public class TcpExternalCommunication : ExternalCommunicationBase
             AcceptClientAsync();
         }
     }
+
     private async Task AcceptClientAsync()
     {
         while (_isRunning)
@@ -87,7 +88,7 @@ public class TcpExternalCommunication : ExternalCommunicationBase
         _client?.GetStream().Flush();
     }
 
-    public override void SendStatus(OperationStatus status)
+    public override void SendStatus(SystemStatus status)
     {
         SendMessage(status.ToString());
     }

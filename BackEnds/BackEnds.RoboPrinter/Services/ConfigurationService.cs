@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PrinterAdapters.ApixAdapter;
@@ -22,7 +21,6 @@ public static class ConfigurationService
 
         services.AddSingleton<IRobotService, Dobot>();
         services.AddSingleton<IPrinterService, Apix>();
-        services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddSingleton<ViewModel>();
         services.AddSingleton<IOExternalCommunication>();
         services.AddSingleton<GPIOManager>();

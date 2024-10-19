@@ -5,6 +5,7 @@ namespace BackEnds.RoboPrinter.Services.IServices;
 public interface IExternalDeviceCommunication
 {
     event EventHandler<ExternalDeviceEventArgs> UpdateSerialNumberRequested;
+    event EventHandler<ExternalDeviceEventArgs> LoadProductRequested;
     event EventHandler PrintRequested;
     event EventHandler<ExternalDeviceEventArgs> PickLabelRequested;
     event EventHandler<ExternalDeviceEventArgs> ApplyLabelRequested;
@@ -13,6 +14,7 @@ public interface IExternalDeviceCommunication
     event EventHandler ResetRequested;
     void Connect();
     void Disconnect();
+    void Load(int activeOperativeMode);
     void Reset();
-    void SendStatus(OperationStatus status);
+    void SendStatus(SystemStatus status);
 }

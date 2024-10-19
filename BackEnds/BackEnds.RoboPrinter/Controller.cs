@@ -1,4 +1,6 @@
-﻿using Entities;
+﻿#region Imports
+
+using Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using BackEnds.RoboPrinter.Models;
@@ -10,7 +12,8 @@ using static UseCases.core.IRobotService;
 using System.Net.NetworkInformation;
 using BackEnds.RoboPrinter.Services;
 using Microsoft.AspNetCore.Identity;
-using System.Diagnostics;
+
+#endregion
 
 namespace BackEnds.RoboPrinter;
 
@@ -21,33 +24,32 @@ public class Controller
     private readonly IPrinterService _printerService;
     private readonly IConfiguration _configuration;
     private readonly ViewModel _viewModel;
-    private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly ICycleService _cycleService;
     private readonly IOExternalCommunication _ioExternalCommunication;
+    private readonly IExternalDeviceCommunication _externalDeviceCommunication;
     private readonly GPIOManager _gpioManager;
     private bool _useDigitalIO;
     private int _activeOperativeModeId = 0;
     private bool _areDigitalIOSignalsEnabled = false;
     private bool _isExecuteEntireCycleEnabled = false;
-    private int _activeProduct = 0;
     private string _manualSerialNumber = string.Empty;
     private RobotPosition? _applicationRouteHomePosition;
     public bool IsCycling { get; private set; } = false;
 
     public Controller(ILogger<Controller> logger, IRobotService robotService, IPrinterService printerService,
-        IConfiguration configuration, ViewModel viewModel, IJwtTokenGenerator jwtTokenGenerator, ICycleService cycleService, 
-        GPIOManager gpioManager, IOExternalCommunication ioExternalCommunication)
+        IConfiguration configuration, ViewModel viewModel, ICycleService cycleService, 
+        GPIOManager gpioManager, IOExternalCommunication ioExternalCommunication, IExternalDeviceCommunication externalDeviceCommunication)
     {
         _logger = logger;
         _robotService = robotService;
         _printerService = printerService;
         _configuration = configuration;
         _viewModel = viewModel;
-        _jwtTokenGenerator = jwtTokenGenerator;
         _cycleService = cycleService;
         _gpioManager = gpioManager;
         _ioExternalCommunication = ioExternalCommunication;
         Task.Run(CheckHomePosition);
+        _externalDeviceCommunication = externalDeviceCommunication;
     }
 
     public async Task AddNewRouteStep(RouteStepDto routeStepDto)
@@ -129,8 +131,8 @@ public class Controller
 
     public async Task<int> GetActiveProduct()
     {
-        _activeProduct = await _viewModel.GetActiveProduct();
-        return _activeProduct;
+        await _viewModel.GetActiveProduct();
+        return _viewModel.ActiveProductId;
     }
 
     public async Task<bool> AreDigitalIOSignalsEnabled()
@@ -407,8 +409,8 @@ public class Controller
     public async void StopDragRobot()
     {
         _robotService.StopDrag();
-        _activeProduct = await _viewModel.GetActiveProduct();
-        int RouteStep = await _cycleService.EstimatePosition(_activeProduct);
+        await _viewModel.GetActiveProduct();
+        int RouteStep = await _cycleService.EstimatePosition(_viewModel.ActiveProductId);
         await _viewModel.SaveLastExecutedRouteStep(RouteStep);
     }
 
@@ -465,6 +467,7 @@ public class Controller
             _activeOperativeModeId = newOperativeModeId;
 
             await _viewModel.SaveActiveOperativeMode(newOperativeModeId);
+            _externalDeviceCommunication?.Load(_activeOperativeModeId);
             // Esempio di logica per gestire le modalità
             switch (_activeOperativeModeId)
             {
@@ -497,9 +500,9 @@ public class Controller
 
     public async Task SaveActiveProduct(int newActiveProduct)
     {
-        if (_activeProduct != newActiveProduct)
+        if (_viewModel.ActiveProductId != newActiveProduct)
         {
-            _activeProduct = newActiveProduct;
+            _viewModel.ActiveProductId = newActiveProduct;
 
             await _viewModel.SaveActiveProduct(newActiveProduct);
 
@@ -552,14 +555,14 @@ public class Controller
     {
         while (true)
         {
-            if (_activeProduct == 0)
+            if (_viewModel.ActiveProductId == 0)
             {
-                _activeProduct = await _viewModel.GetActiveProduct();
+                _viewModel.ActiveProductId = await _viewModel.GetActiveProduct();
             }
 
             if (_applicationRouteHomePosition is null)
             {
-                _applicationRouteHomePosition = await _viewModel.GetApplicationRouteHomePosition(_activeProduct);
+                _applicationRouteHomePosition = await _viewModel.GetApplicationRouteHomePosition(_viewModel.ActiveProductId);
             }
 
             bool isNearHome = RobotPosition.AreNear(_robotService.CurrentPosition, _applicationRouteHomePosition, 0.1f);
