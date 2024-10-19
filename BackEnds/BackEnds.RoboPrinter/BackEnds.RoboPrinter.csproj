@@ -32,6 +32,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Adapters\PrinterAdapters.ApixAdapter\PrinterAdapters.ApixAdapter.csproj" />
     <ProjectReference Include="..\..\Adapters\RobotAdapters.DobotAdapter\RobotAdapters.DobotAdapter.csproj" />
+    <ProjectReference Include="..\..\Entities\Entities.csproj" />
   </ItemGroup>
 
 </Project>
