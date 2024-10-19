@@ -1,8 +1,11 @@
+#region Imports
+
+using BackEnds.RoboPrinter.Services;
 using FrontEnds.RoboPrinter.Components;
 using FrontEnds.RoboPrinter.Data;
-using FrontEnds.RoboPrinter.Utility;
 using Serilog;
-using BackEnds.RoboPrinter.Services;
+
+#endregion
 
 var builder = WebApplication.CreateBuilder(args);
 Environment.CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -15,7 +18,6 @@ builder.Logging.ClearProviders();
 builder.Logging.AddSerilog();
 builder.Services.AddLocalization();
 builder.Services.AddControllers();
-builder.Services.AddSingleton<VersionService>();
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()

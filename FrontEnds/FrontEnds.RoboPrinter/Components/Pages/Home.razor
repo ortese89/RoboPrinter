@@ -1,7 +1,5 @@
 ﻿@page "/home"
-@using Utility
-@inject VersionService VersionService
-
+@using System.Reflection
 <PageTitle>Home</PageTitle>
 
 <div class="main-container">
@@ -10,19 +8,9 @@
     </div>
 
     <div class="version-container">
-        <p>SW Version: @version</p>
+        <p>SW Version: @(Assembly.GetExecutingAssembly().GetName().Version)</p>
     </div>
 </div>
-
-@code {
-    private string version;
-
-    protected override void OnInitialized()
-    {
-        version = VersionService.GetVersion();
-        StateHasChanged(); // Forza il rendering se necessario
-    }
-}
 
 <style>
     body {
