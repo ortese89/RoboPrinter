@@ -1,0 +1,92 @@
+﻿@page "/"
+
+@using System.ComponentModel.DataAnnotations
+@using System.IdentityModel.Tokens.Jwt
+@using FrontEnds.RoboPrinter.Data
+@using FrontEnds.RoboPrinter.Models.Dto
+
+@inject Controller controller
+@inject NavigationManager navigationManager
+@inject IJSRuntime jsRuntime
+@inject IStringLocalizer<Common> localizer 
+@inject UserData userData
+
+<PageTitle>Login</PageTitle>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-sm-8">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h3 class="text-center">@localizer["Login"]</h3>
+                </div>
+                <div class="card-body">
+                    <EditForm FormName="loginForm" Model="@loginDto" OnValidSubmit="@HandleLogin">
+                        <DataAnnotationsValidator />
+
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <InputText id="username" class="form-control form-control-lg" @bind-Value="loginDto.Username" />
+                            <ValidationMessage For="@(() => loginDto.Username)" />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <InputText type="password" id="password" class="form-control form-control-lg" @bind-Value="loginDto.Password" />
+                            <ValidationMessage For="@(() => loginDto.Password)" />
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg btn-block">@localizer["Accedi"]</button>
+                        <p class="error-message">@errorMessage</p>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string errorMessage = string.Empty;
+
+    private LoginDto loginDto = new();
+
+    private async Task HandleLogin()
+    {
+        // string token = await controller.Login(loginDto.Username, loginDto.Password);
+
+        // if (!string.IsNullOrEmpty(token))
+        //     await SignInUser(token);
+        var loginData = await controller.Login(loginDto.Username, loginDto.Password);
+
+        if (loginData.User != null && loginData.Roles != null)
+        {
+            await SignInUser(loginData.User, loginData.Roles);
+        }
+        else
+        {
+            errorMessage = localizer["UtenteAssente"];
+        }
+    }
+
+    // private async Task SignInUser(string token)
+    // {
+    //     await jsRuntime.InvokeVoidAsync("localStorage.setItem", "token", token);
+    //     navigationManager.NavigateTo("/home", forceLoad: true);
+    // }
+
+
+    private async Task SignInUser(Microsoft.AspNetCore.Identity.IdentityUser user, IList<string> roles)
+    {
+        userData.UserName = user.UserName;
+        userData.UserId = Convert.ToInt32(user.Id);
+        userData.Roles = roles.ToList();
+        // await jsRuntime.InvokeVoidAsync("localStorage.setItem", "token", token);
+        navigationManager.NavigateTo("/home", forceLoad: true);
+    }
+
+}
+
+<style>
+
+    .error-message {
+        color: #ff0000;
+        margin-top: 10px;
+    }
+</style>

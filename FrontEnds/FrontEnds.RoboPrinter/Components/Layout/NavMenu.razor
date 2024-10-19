@@ -1,0 +1,87 @@
+﻿@inject IStringLocalizer<Common> localizer
+@inject UserData userData
+@inject NavigationManager navigationManager
+
+<div class="nav-container d-flex justify-content-between">
+    @if (userData.UserId != 0)
+    {
+        <div class="nav-scrollable">
+            <nav class="d-flex flex-row">
+                <div class="nav-item py-3">
+                    <NavLink class="nav-link" href="home">
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span>@localizer["Home"]
+                    </NavLink>
+                </div>
+
+                <div class="nav-item py-3">
+                    <NavLink class="nav-link" href="manualfunctions">
+                        <span class="bi bi-joystick-nav-menu" aria-hidden="true"></span>@localizer["FunzioniManuali"]
+                    </NavLink>
+                </div>
+
+                @if (userData.Roles.Contains(Utility.SD.AdminRole))
+                {
+                    <div class="nav-item py-3">
+                        <NavLink class="nav-link" href="newproduct">
+                        <span class="bi bi-product-fill-nav-menu" aria-hidden="true"></span>@localizer["NuovoProdotto"]
+                        </NavLink>
+                    </div>
+                }
+
+                <div class="nav-item py-3">
+                    <NavLink class="nav-link" href="product">
+                        <span class="bi bi-product-fill-nav-menu" aria-hidden="true"></span>@localizer["Prodotti"]
+                    </NavLink>
+                </div>
+
+                @if (userData.Roles.Contains(Utility.SD.AdminRole))
+                {
+                    <div class="nav-item py-3">
+                        <NavLink class="nav-link" href="label">
+                            <span class="bi bi-label-nav-menu" aria-hidden="true"></span>@localizer["Etichette"]
+                        </NavLink>
+                    </div>
+                }
+
+                <div class="nav-item py-3">
+                    <NavLink class="nav-link" href="history">
+                        <span class="bi bi-clock-history-nav-menu" aria-hidden="true"></span>@localizer["Storico"]
+                    </NavLink>
+                </div>
+
+                @if (userData.Roles.Contains(Utility.SD.AdminRole))
+                {
+                    <div class="nav-item py-3">
+                        <NavLink class="nav-link" href="settings">
+                            <span class="bi bi-label-nav-menu" aria-hidden="true"></span>@localizer["Impostazioni"]
+                        </NavLink>
+                    </div>
+                }
+                
+                <div class="nav-item py-3">
+                    <NavLink class="nav-link" @onclick="Logout">
+                        <span class="bi bi-logout-nav-menu" aria-hidden="true"></span>@localizer["Logout"]
+                    </NavLink>
+                </div>
+            </nav>
+        </div>
+
+    }
+
+    <LanguageSwitcher />
+    <ShutdownController />
+</div>
+
+@code {
+    private void Logout()
+    {
+        userData.ClearData();
+        navigationManager.NavigateTo("/", forceLoad: true);
+    }
+}
+
+<style>
+    .nav-link {
+        cursor: pointer;
+    }
+</style>

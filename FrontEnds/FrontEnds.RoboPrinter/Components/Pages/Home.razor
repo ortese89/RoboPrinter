@@ -1,0 +1,63 @@
+﻿@page "/home"
+@using Utility
+@inject VersionService VersionService
+
+<PageTitle>Home</PageTitle>
+
+<div class="main-container">
+    <div class="logo-container">
+        <img class="logo-image" src="images/logo_home.png" />
+    </div>
+
+    <div class="version-container">
+        <p>SW Version: @version</p>
+    </div>
+</div>
+
+@code {
+    private string version;
+
+    protected override void OnInitialized()
+    {
+        version = VersionService.GetVersion();
+        StateHasChanged(); // Forza il rendering se necessario
+    }
+}
+
+<style>
+    body {
+        background-color: white;
+        margin: 0;
+        height: 100vh;
+        overflow: hidden; /* Disabilita lo scorrimento */
+    }
+
+    * {
+        box-sizing: border-box; /* Assicurati che padding e margini siano inclusi nelle dimensioni */
+    }
+
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-shrink: 0; /* Evita la riduzione degli elementi */
+    }
+
+    .logo-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .logo-image {
+        width: 50%;
+    }
+
+    .version-container {
+        margin-top: 10px; /* Riduci il margine superiore */
+        font-size: 1rem;
+        color: black;
+    }
+</style>

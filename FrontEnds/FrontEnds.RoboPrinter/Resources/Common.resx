@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="A" xml:space="preserve">
+    <value>A</value>
+  </data>
+  <data name="Accedi" xml:space="preserve">
+    <value>Accedi</value>
+  </data>
+  <data name="AggiungiSvincolo" xml:space="preserve">
+    <value>Aggiungi Punto di Svincolo</value>
+  </data>
+  <data name="ApplicaFiltri" xml:space="preserve">
+    <value>Applica Filtri</value>
+  </data>
+  <data name="AvviaCiclo" xml:space="preserve">
+    <value>Avvia Ciclo</value>
+  </data>
+  <data name="AvviaCicloContinuo" xml:space="preserve">
+    <value>Avvia Ciclo Continuo</value>
+  </data>
+  <data name="AvviaCicloSingolo" xml:space="preserve">
+    <value>Avvia Ciclo Singolo</value>
+  </data>
+  <data name="AzzeraFiltri" xml:space="preserve">
+    <value>Azzera Filtri</value>
+  </data>
+  <data name="CancellaTutto" xml:space="preserve">
+    <value>CancellaTutto</value>
+  </data>
+  <data name="Carica" xml:space="preserve">
+    <value>Carica</value>
+  </data>
+  <data name="Contenuto" xml:space="preserve">
+    <value>Contenuto</value>
+  </data>
+  <data name="Da" xml:space="preserve">
+    <value>Da</value>
+  </data>
+  <data name="Descrizione" xml:space="preserve">
+    <value>Descrizione</value>
+  </data>
+  <data name="Diagnostica" xml:space="preserve">
+    <value>Diagnostica</value>
+  </data>
+  <data name="Duplica" xml:space="preserve">
+    <value>Duplica</value>
+  </data>
+  <data name="Etichette" xml:space="preserve">
+    <value>Etichette</value>
+  </data>
+  <data name="FunzioniManuali" xml:space="preserve">
+    <value>Funzioni Manuali</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="ID" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="IdProdottoRichiesto" xml:space="preserve">
+    <value>Selezionare un prodotto da clonare</value>
+  </data>
+  <data name="Impostazioni" xml:space="preserve">
+    <value>Impostazioni</value>
+  </data>
+  <data name="Matricola" xml:space="preserve">
+    <value>Matricola</value>
+  </data>
+  <data name="MostraFiltri" xml:space="preserve">
+    <value>Mostra Filtri</value>
+  </data>
+  <data name="NascondiFiltri" xml:space="preserve">
+    <value>Nascondi Filtri</value>
+  </data>
+  <data name="Nome Prodotto" xml:space="preserve">
+    <value>Nome Prodotto</value>
+  </data>
+  <data name="NomeProdottoRichiesto" xml:space="preserve">
+    <value>Il nome del prodotto è obbligatorio</value>
+  </data>
+  <data name="Nuovo Prodotto" xml:space="preserve">
+    <value>Nuovo Prodotto</value>
+  </data>
+  <data name="NuovoProdotto" xml:space="preserve">
+    <value>Nuovo Prodotto</value>
+  </data>
+  <data name="OrarioApplicazione" xml:space="preserve">
+    <value>Orario di applicazione</value>
+  </data>
+  <data name="OrarioPrelievo" xml:space="preserve">
+    <value>Orario di prelievo</value>
+  </data>
+  <data name="PasswordRichiesta" xml:space="preserve">
+    <value>La password è obbligatoria</value>
+  </data>
+  <data name="Percorso" xml:space="preserve">
+    <value>Percorso</value>
+  </data>
+  <data name="Prodotti" xml:space="preserve">
+    <value>Prodotti</value>
+  </data>
+  <data name="Prodotto" xml:space="preserve">
+    <value>Prodotto</value>
+  </data>
+  <data name="Prodotto da clonare" xml:space="preserve">
+    <value>Prodotto da clonare</value>
+  </data>
+  <data name="Robot" xml:space="preserve">
+    <value>Robot</value>
+  </data>
+  <data name="Salva" xml:space="preserve">
+    <value>Salva</value>
+  </data>
+  <data name="SelezionaPercorso" xml:space="preserve">
+    <value>Seleziona percorso</value>
+  </data>
+  <data name="SelezionaProdotto" xml:space="preserve">
+    <value>Seleziona prodotto</value>
+  </data>
+  <data name="Storico" xml:space="preserve">
+    <value>Storico</value>
+  </data>
+  <data name="UsernameRichiesto" xml:space="preserve">
+    <value>Il nome utente è obbligatorio</value>
+  </data>
+  <data name="VaiA" xml:space="preserve">
+    <value>Vai</value>
+  </data>
+  <data name="ConfermaSpegnimento" xml:space="preserve">
+    <value>Sicuro di voler spegnere il sistema?</value>
+  </data>
+  <data name="UtenteAssente" xml:space="preserve">
+    <value>Utente non trovato</value>
+  </data>
+  <data name="ProdottoEsistente" xml:space="preserve">
+    <value>Prodotto già esistente!</value>
+  </data>
+  <data name="FunzioniManualieDiagnostica" xml:space="preserve">
+    <value>Funzioni Manuali e Diagnostica</value>
+  </data>
+  <data name="Stampante" xml:space="preserve">
+    <value>Stampante</value>
+  </data>
+  <data name="PneumaticaVuoto" xml:space="preserve">
+    <value>Pneumatica - Vuoto</value>
+  </data>
+  <data name="PneumaticaSoffiatore" xml:space="preserve">
+    <value>Pneumatica - Soffiatore</value>
+  </data>
+  <data name="AssorbimentoAsseJ1" xml:space="preserve">
+    <value>Assorbimento Asse J1</value>
+  </data>
+  <data name="AssorbimentoAsseJ2" xml:space="preserve">
+    <value>Assorbimento Asse J2</value>
+  </data>
+  <data name="AssorbimentoAsseJ3" xml:space="preserve">
+    <value>Assorbimento Asse J3</value>
+  </data>
+  <data name="AssorbimentoAsseJ4" xml:space="preserve">
+    <value>Assorbimento Asse J4</value>
+  </data>
+  <data name="AssorbimentoAsseJ5" xml:space="preserve">
+    <value>Assorbimento Asse J5</value>
+  </data>
+  <data name="AssorbimentoAsseJ6" xml:space="preserve">
+    <value>Assorbimento Asse J6</value>
+  </data>
+  <data name="ModalitaOperativa" xml:space="preserve">
+    <value>Modalità Operativa</value>
+  </data>
+  <data name="ModalitaCorrente" xml:space="preserve">
+    <value>Modalità Corrente</value>
+  </data>
+  <data name="SelezionareModalitaOperativa" xml:space="preserve">
+    <value>Selezionare Modalità Operativa</value>
+  </data>
+  <data name="I/ODigitali" xml:space="preserve">
+    <value>I/O Digitali</value>
+  </data>
+  <data name="Autoapplicazione" xml:space="preserve">
+    <value>Autoapplicazione</value>
+  </data>
+  <data name="ModalitaImpulsiva" xml:space="preserve">
+    <value>Modalità Impulsiva</value>
+  </data>
+  <data name="Applica" xml:space="preserve">
+    <value>Applica</value>
+  </data>
+  <data name="Elimina" xml:space="preserve">
+    <value>ELIMINA</value>
+  </data>
+</root>

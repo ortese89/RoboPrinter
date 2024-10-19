@@ -1,0 +1,181 @@
+﻿@page "/history"
+
+@using BackEnds.RoboPrinter.Models
+@using BackEnds.RoboPrinter.Models.Dto
+@using Microsoft.AspNetCore.Components.Web
+
+
+@inject Controller controller
+@inject IJSRuntime jsRuntime
+@inject IStringLocalizer<Common> localizer
+
+<PageTitle>History</PageTitle>
+<div>
+    <button class="btn btn-secondary" @onclick="ToggleFilters">
+        @(areFiltersVisible ? localizer["NascondiFiltri"] : localizer["MostraFiltri"])
+    </button>
+    <button class="btn btn-danger delete-all-btn" @onclick="DeleteAllFilteredItems">
+        @localizer["CancellaTutto"]
+    </button>
+</div>
+
+<div class="filters @(areFiltersVisible ? "show" : "hide")">
+    <div class="form-group">
+        <label for="productName">@localizer["Prodotto"]:</label>
+        <select class="form-control" @bind="filters.ProductId">
+            <option value="0">All</option>
+            @foreach (var product in products)
+            {
+                <option value="@product.Id">@product.Description</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="operativeModeName">@localizer["ModalitaOperativa"]:</label>
+        <select class="form-control" @bind="filters.OperativeModeId">
+            <option value="0">All</option>
+            @foreach (var operativeMode in operativeModes)
+            {
+                <option value="@operativeMode.Id">@operativeMode.Description</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="serialNumber">@localizer["Matricola"]</label>
+        <input type="text" class="form-control" @bind="filters.SerialNumber" />
+    </div>
+    <div class="form-group">
+        <label for="pickupTimeFrom">@localizer["OrarioPrelievo"] @localizer["Da"]:</label>
+        <input type="datetime-local" class="form-control" @bind="filters.PickupTimeFrom" />
+    </div>
+    <div class="form-group">
+        <label for="pickupTimeTo">@localizer["OrarioPrelievo"] @localizer["A"]:</label>
+        <input type="datetime-local" class="form-control" @bind="filters.PickupTimeTo" />
+    </div>
+    <div class="form-group">
+        <label for="applicationTimeFrom">@localizer["OrarioApplicazione"] @localizer["Da"]:</label>
+        <input type="datetime-local" class="form-control" @bind="filters.ApplicationTimeFrom" />
+    </div>
+    <div class="form-group">
+        <label for="applicationTimeTo">@localizer["OrarioApplicazione"] @localizer["A"]:</label>
+        <input type="datetime-local" class="form-control" id="applicationTimeTo" @bind="filters.ApplicationTimeTo" />
+    </div>
+    <button class="btn btn-primary" @onclick="ApplyFilters">Apply Filters</button>
+    <button class="btn btn-primary" @onclick="ResetFilters">Reset Filters</button>
+</div>
+
+<div class="history-table" @ref="tableRef">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@localizer["Id"]</th>
+                <th>@localizer["Prodotto"]</th>
+                <th>@localizer["ModalitaOperativa"]</th>
+                <th>@localizer["Matricola"]</th>
+                <th>@localizer["OrarioPrelievo"]</th>
+                <th>@localizer["OrarioApplicazione"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in historyItems)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.ProductName</td>
+                    <td>@item.OperativeModeName</td>
+                    <td>@item.SerialNumber</td>
+                    <td>@item.PickupTime</td>
+                    <td>@item.ApplicationTime</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (isLoading)
+    {
+        <div class="loading-indicator">Loading...</div>
+    }
+</div>
+
+@code {
+    private HistoryDto[] historyItems = [];
+    private ProductDto[] products = [];
+    private OperativeModeDto[] operativeModes = [];
+    private HistoryFilters filters = new(1);
+    private bool isLoading = false;
+    private bool areFiltersVisible = false;
+    private ElementReference tableRef;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await controller.GetProducts();
+        operativeModes = await controller.GetOperativeModes();
+        await LoadHistory();
+    }
+
+    private async Task LoadHistory()
+    {
+        isLoading = true;
+        historyItems = await controller.GetHistories(filters);
+        isLoading = false;
+    }
+
+    private void ToggleFilters()
+    {
+        areFiltersVisible = !areFiltersVisible;
+    }
+
+    private async Task ApplyFilters()
+    {
+        historyItems = [];
+        filters.StartIndex = 1;
+        await LoadHistory();
+    }
+
+    private async Task ResetFilters()
+    {
+        historyItems = [];
+        filters = new(1);
+        await LoadHistory();
+    }
+
+    private async Task DeleteAllFilteredItems()
+    {
+        bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Sei sicuro di voler eliminare?");
+        if (confirmed)
+        {
+            await controller.DeleteAllFilteredItems(filters);
+            await LoadHistory();
+        }
+    }
+}
+
+<style>
+    .filters {
+        position: absolute;
+        left: 20px;
+        z-index: 1;
+        background-color: white; 
+        padding: 10px;
+        width: 50%;
+        transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+    }
+
+    .filters.show {
+        max-height: 1000px;
+        opacity: 1;
+    }
+
+    .history-table {
+        max-height: 800px;
+        overflow-y: auto;
+    }
+
+    .delete-all-btn {
+        align-self: flex-end;
+    }
+
+</style>

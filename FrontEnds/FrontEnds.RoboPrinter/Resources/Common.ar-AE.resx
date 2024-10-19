@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="A" xml:space="preserve">
+    <value>إلى</value>
+  </data>
+  <data name="Accedi" xml:space="preserve">
+    <value>دخول</value>
+  </data>
+  <data name="AggiungiSvincolo" xml:space="preserve">
+    <value>Add Clearance Point</value>
+  </data>
+  <data name="ApplicaFiltri" xml:space="preserve">
+    <value>تطبيق المرشحات</value>
+  </data>
+  <data name="AvviaCiclo" xml:space="preserve">
+    <value>Start Cycle</value>
+  </data>
+  <data name="AvviaCicloContinuo" xml:space="preserve">
+    <value>بدء الدورة المستمرة</value>
+  </data>
+  <data name="AvviaCicloSingolo" xml:space="preserve">
+    <value>بدء الدورة الفردية</value>
+  </data>
+  <data name="AzzeraFiltri" xml:space="preserve">
+    <value>إعادة تعيين المرشحات</value>
+  </data>
+  <data name="CancellaTutto" xml:space="preserve">
+    <value>Delete All</value>
+  </data>
+  <data name="Carica" xml:space="preserve">
+    <value>تحميل</value>
+  </data>
+  <data name="Contenuto" xml:space="preserve">
+    <value>محتوى</value>
+  </data>
+  <data name="Da" xml:space="preserve">
+    <value>من</value>
+  </data>
+  <data name="Descrizione" xml:space="preserve">
+    <value>وصف</value>
+  </data>
+  <data name="Diagnostica" xml:space="preserve">
+    <value>التشخيص</value>
+  </data>
+  <data name="Duplica" xml:space="preserve">
+    <value>Clone</value>
+  </data>
+  <data name="Etichette" xml:space="preserve">
+    <value>ملصقات</value>
+  </data>
+  <data name="FunzioniManuali" xml:space="preserve">
+    <value>وظائف يدوية</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>الصفحة الرئيسية</value>
+  </data>
+  <data name="ID" xml:space="preserve">
+    <value>معرف</value>
+  </data>
+  <data name="IdProdottoRichiesto" xml:space="preserve">
+    <value>Select a product to clone</value>
+  </data>
+  <data name="Impostazioni" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Matricola" xml:space="preserve">
+    <value>الرقم التسلسلي</value>
+  </data>
+  <data name="MostraFiltri" xml:space="preserve">
+    <value>إظهار الفلاتر</value>
+  </data>
+  <data name="NascondiFiltri" xml:space="preserve">
+    <value>إخفاء الفلاتر</value>
+  </data>
+  <data name="Nome Prodotto" xml:space="preserve">
+    <value>Product Name</value>
+  </data>
+  <data name="NomeProdottoRichiesto" xml:space="preserve">
+    <value>The product's name is required</value>
+  </data>
+  <data name="Nuovo Prodotto" xml:space="preserve">
+    <value>New Product</value>
+  </data>
+  <data name="NuovoProdotto" xml:space="preserve">
+    <value>New Product</value>
+  </data>
+  <data name="OrarioApplicazione" xml:space="preserve">
+    <value>وقت اللصق</value>
+  </data>
+  <data name="OrarioPrelievo" xml:space="preserve">
+    <value>وقت الالتقاط</value>
+  </data>
+  <data name="PasswordRichiesta" xml:space="preserve">
+    <value>اسم المستخدم مطلوب</value>
+  </data>
+  <data name="Percorso" xml:space="preserve">
+    <value>مسار</value>
+  </data>
+  <data name="Prodotti" xml:space="preserve">
+    <value>المنتجات</value>
+  </data>
+  <data name="Prodotto" xml:space="preserve">
+    <value>المنتج</value>
+  </data>
+  <data name="Prodotto da clonare" xml:space="preserve">
+    <value>Product to clone</value>
+  </data>
+  <data name="Robot" xml:space="preserve">
+    <value>الروبوت</value>
+  </data>
+  <data name="Salva" xml:space="preserve">
+    <value>حفظ</value>
+  </data>
+  <data name="SelezionaPercorso" xml:space="preserve">
+    <value>اختر المسار</value>
+  </data>
+  <data name="SelezionaProdotto" xml:space="preserve">
+    <value>حدد المنتج</value>
+  </data>
+  <data name="Storico" xml:space="preserve">
+    <value>السجل</value>
+  </data>
+  <data name="UsernameRichiesto" xml:space="preserve">
+    <value>كلمة المرور مطلوبة</value>
+  </data>
+  <data name="VaiA" xml:space="preserve">
+    <value>اذهب إلى</value>
+  </data>
+  <data name="ConfermaSpegnimento" xml:space="preserve">
+    <value>Are you sure you want to shutdown the system?</value>
+  </data>
+  <data name="UtenteAssente" xml:space="preserve">
+    <value>المستخدم غير موجود</value>
+  </data>
+  <data name="ProdottoEsistente" xml:space="preserve">
+    <value>المنتج موجود بالفعل!</value>
+  </data>
+  <data name="FunzioniManualieDiagnostica" xml:space="preserve">
+    <value>الوظائف اليدوية والتشخيصات</value>
+  </data>
+  <data name="Stampante" xml:space="preserve">
+    <value>طابعة</value>
+  </data>
+  <data name="PneumaticaVuoto" xml:space="preserve">
+    <value>فراغ هوائي</value>
+  </data>
+  <data name="PneumaticaSoffiatore" xml:space="preserve">
+    <value>منفاخ هوائي</value>
+  </data>
+  <data name="AssorbimentoAsseJ1" xml:space="preserve">
+    <value>محور امتصاص القدرة J1</value>
+  </data>
+  <data name="AssorbimentoAsseJ2" xml:space="preserve">
+    <value>محور امتصاص القدرة J2</value>
+  </data>
+  <data name="AssorbimentoAsseJ3" xml:space="preserve">
+    <value>محور امتصاص القدرة J3</value>
+  </data>
+  <data name="AssorbimentoAsseJ4" xml:space="preserve">
+    <value>محور امتصاص القدرة J4</value>
+  </data>
+  <data name="AssorbimentoAsseJ5" xml:space="preserve">
+    <value>محور امتصاص القدرة J5</value>
+  </data>
+  <data name="AssorbimentoAsseJ6" xml:space="preserve">
+    <value>محور امتصاص القدرة J6</value>
+  </data>
+  <data name="ModalitaOperativa" xml:space="preserve">
+    <value>الوضع التشغيلي</value>
+  </data>
+  <data name="ModalitaCorrente" xml:space="preserve">
+    <value>الوضع الحالي</value>
+  </data>
+  <data name="SelezionareModalitaOperativa" xml:space="preserve">
+    <value>حدد وضع التشغيل</value>
+  </data>
+  <data name="I/ODigitali" xml:space="preserve">
+    <value>الإدخال/الإخراج الرقمي</value>
+  </data>
+  <data name="Autoapplicazione" xml:space="preserve">
+    <value>التطبيق الذاتي</value>
+  </data>
+  <data name="ModalitaImpulsiva" xml:space="preserve">
+    <value>الوضع الاندفاعي</value>
+  </data>
+  <data name="Applica" xml:space="preserve">
+    <value>يتقدم</value>
+  </data>
+  <data name="Elimina" xml:space="preserve">
+    <value>يمسح</value>
+  </data>
+</root>

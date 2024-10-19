@@ -1,0 +1,97 @@
+﻿@page "/newproduct"
+
+@using Entities
+@using BackEnds.RoboPrinter.Models
+@using BackEnds.RoboPrinter.Models.Dto
+@using FrontEnds.RoboPrinter.Models.Dto
+@using static UseCases.core.IRobotService
+
+@inject Controller controller
+@inject IJSRuntime jsRuntime
+@inject IStringLocalizer<Common> localizer
+
+<PageTitle>New Products</PageTitle>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-sm-8">
+            <div class="card mt-1">
+                <div class="card-header">
+                    <h3 class="text-center">@localizer["Nuovo Prodotto"]</h3>
+                </div>
+                <div class="card-body">
+                    <EditForm FormName="productForm" Model="@newProductDto" OnValidSubmit="@CloneProduct">
+                        <DataAnnotationsValidator />
+
+                        <div class="form-group mb-3">
+                            <label for="name">@localizer["Nome Prodotto"]</label>
+                            <InputText id="name" class="form-control form-control-lg" @bind-Value="newProductDto.Name" />
+                            <ValidationMessage For="@(() => newProductDto.Name)" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="productSelect">@localizer["Prodotto da clonare"]</label>
+                            <select id="productSelect" class="form-select" @bind="@newProductDto.ProductIdToClone">
+                                <option value="0">-- @localizer["SelezionaProdotto"] --</option>
+                                @foreach (var product in _products)
+                                {
+                                    <option value="@product.Id">@product.Description</option>
+                                }
+                            </select>
+                            <ValidationMessage For="@(() => newProductDto.ProductIdToClone)" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg btn-block mt-3">
+                            @localizer["Duplica"]
+                        </button>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success">
+        @successMessage
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
+
+
+
+@code {
+
+    private NewProductDto newProductDto = new();
+    private ProductDto[] _products { get; set; } = [];
+    private string? successMessage; 
+    private string? errorMessage; 
+
+    protected override async Task OnInitializedAsync()
+    {
+        _products = await controller.GetProducts();
+    }
+
+    private async Task CloneProduct()
+    {
+        if (_products.Any(x => x.Description == newProductDto.Name))
+        {
+            errorMessage = localizer["ProdottoEsistente"];
+            successMessage = null;
+            return;
+        }
+
+        await controller.CloneProduct(newProductDto.ProductIdToClone, newProductDto.Name);
+        successMessage = "Prodotto clonato con successo!";
+        errorMessage = null;
+        newProductDto.Name = "";
+        newProductDto.ProductIdToClone = 0;
+    }
+}

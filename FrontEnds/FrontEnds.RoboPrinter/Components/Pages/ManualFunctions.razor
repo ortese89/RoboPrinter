@@ -1,0 +1,501 @@
+﻿@page "/manualfunctions"
+@using static UseCases.core.IRobotService
+
+@inject Controller controller
+@inject IStringLocalizer<Common> localizer
+@inject IJSRuntime JS
+@inject UserData userData
+
+<PageTitle>Joystick</PageTitle>
+
+<h1>@(localizer["FunzioniManualieDiagnostica"])</h1>
+
+<div class="main-container">
+    <div class="left-section">
+        <div class="section">
+            <h2>Robot Status</h2>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <!-- Stato di connessione (20%) -->
+                <div class="led-container" style="flex: 0 0 20%; display: flex; align-items: center; gap: 10px;">
+                    <div class="led" style="width: 20px; height: 20px; background-color: @(controller.IsRobotConnected() ? "green" : "red");"></div>
+                    <label>Connected</label>
+                </div>
+
+                <!-- Stato del robot (60%) -->
+                <div style="flex: 0 0 60%; font-size: 30px; display: flex; align-items: center; gap: 10px;">
+                    <label>STATUS:</label>
+                    <label>@(controller.GetRobotStatus())</label>
+                </div>
+
+                <!-- Assorbimenti degli assi (20%) -->
+                <div style="flex: 0 0 20%; font-size: 12px; display: flex; flex-direction: column;">
+                    <div style="display: inline-block; margin-bottom: 5px;">
+                        <label>@(localizer["AssorbimentoAsseJ1"])</label>
+                        <label>@(Math.Round(TForce[0], 3))</label>
+                    </div>
+                    <div style="display: inline-block; margin-bottom: 5px;">
+                        <label>@(localizer["AssorbimentoAsseJ2"])</label>
+                        <label>@(Math.Round(TForce[1], 3))</label>
+                    </div>
+                    <div style="display: inline-block; margin-bottom: 5px;">
+                        <label>@(localizer["AssorbimentoAsseJ3"])</label>
+                        <label>@(Math.Round(TForce[2], 3))</label>
+                    </div>
+                    <div style="display: inline-block; margin-bottom: 5px;">
+                        <label>@(localizer["AssorbimentoAsseJ4"])</label>
+                        <label>@(Math.Round(TForce[3], 3))</label>
+                    </div>
+                    <div style="display: inline-block; margin-bottom: 5px;">
+                        <label>@(localizer["AssorbimentoAsseJ5"])</label>
+                        <label>@(Math.Round(TForce[4], 3))</label>
+                    </div>
+                    <div style="display: inline-block;">
+                        <label>@(localizer["AssorbimentoAsseJ6"])</label>
+                        <label>@(Math.Round(TForce[5], 3))</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        @if (userData.Roles.Contains(Utility.SD.AdminRole))
+        {
+            <!-- Sezione Robot System Commands-->
+            <div class="section">
+                <h2>Robot - Sys</h2>
+                <button class="btn btn-primary" @onclick='controller.ResetRobotAlarms'>RESET</button>
+                <button class="btn btn-primary" @onclick='controller.ClearRobotAlarms'>CLEAR</button>
+                <button class="btn btn-primary" @onclick='controller.StartDragRobot'>START DRAG</button>
+                <button class="btn btn-primary" @onclick='controller.StopDragRobot'>STOP DRAG</button>
+                <button class="btn btn-primary" @onclick='controller.PowerOnRobot'>POWER ON</button>
+                <button class="btn btn-primary" @onclick='controller.PowerOffRobot'>POWER OFF</button>
+                <button class="btn btn-primary" @onclick='controller.DisableRobot'>DISABLE</button>
+                <button class="btn btn-primary" @onclick='controller.EnableRobot'>ENABLE</button>
+                <button class="btn btn-primary" @onclick='controller.ReturnToHomePosition'>HOME</button>
+          </div>
+
+            <!-- Sezione Robot Position -->
+            <div class="section">
+            <h2>Robot - Jog</h2>
+            <div class="robot-controls">
+                <!-- Prima riga -->
+                <div class="control-row">
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.X, true)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.X, true)' @ontouchend='() => StopMove()'>X+</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.Y, true)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.Y, true)' @ontouchend='() => StopMove()'>Y+</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.Z, true)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.Z, true)' @ontouchend='() => StopMove()'>Z+</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.Yaw, true)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.Yaw, true)' @ontouchend='() => StopMove()'>Yaw+</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.Pitch, true)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.Pitch, true)' @ontouchend='() => StopMove()'>Pitch+</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.Roll, true)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.Roll, true)' @ontouchend='() => StopMove()'>Roll+</button>
+                </div>
+                <!-- Seconda riga -->
+                <div class="control-row">
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.X, false)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.X, false)' @ontouchend='() => StopMove()'>X-</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.Y, false)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.Y, false)' @ontouchend='() => StopMove()'>Y-</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.Z, false)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.Z, false)' @ontouchend='() => StopMove()'>Z-</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.Yaw, false)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.Yaw, false)' @ontouchend='() => StopMove()'>Yaw-</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.Pitch, false)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.Pitch, false)' @ontouchend='() => StopMove()'>Pitch-</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.Roll, false)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.Roll, false)' @ontouchend='() => StopMove()'>Roll-</button>
+                </div>
+                <!-- Terza riga -->
+                <div class="control-row">
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.J1, true)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.J1, true)' @ontouchend='() => StopMove()'>J1+</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.J2, true)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.J2, true)' @ontouchend='() => StopMove()'>J2+</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.J3, true)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.J3, true)' @ontouchend='() => StopMove()'>J3+</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.J4, true)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.J4, true)' @ontouchend='() => StopMove()'>J4+</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.J5, true)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.J5, true)' @ontouchend='() => StopMove()'>J5+</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.J6, true)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.J6, true)' @ontouchend='() => StopMove()'>J6+</button>
+                </div>
+                <!-- Quarta riga -->
+                <div class="control-row">
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.J1, false)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.J1, false)' @ontouchend='() => StopMove()'>J1-</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.J2, false)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.J2, false)' @ontouchend='() => StopMove()'>J2-</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.J3, false)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.J3, false)' @ontouchend='() => StopMove()'>J3-</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.J4, false)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.J4, false)' @ontouchend='() => StopMove()'>J4-</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.J5, false)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.J5, false)' @ontouchend='() => StopMove()'>J5-</button>
+                    <button class="btn btn-primary" @onmousedown='() => MoveJog(JogMovement.J6, false)' @onmouseup='() => StopMove()' @ontouchstart='() => MoveJog(JogMovement.J6, false)' @ontouchend='() => StopMove()'>J6-</button>
+                </div>
+            </div>
+        </div>
+        }
+
+        <div class="section">
+            <h2>@(localizer["Stampante"])</h2>
+            <button class="btn btn-primary" @onclick='() => FormFeed()'>FEED</button>
+            @* <button class="btn btn-primary" @onclick='() => Print()'>PRINT</button> *@
+        </div>
+        <div class="section">
+            <h2>@(localizer["PneumaticaVuoto"])</h2>
+            <button class="btn btn-primary" @onclick='() => UpdateVacuumStatus(true)'>VAC ON</button>
+            <button class="btn btn-primary" @onclick='() => UpdateVacuumStatus(false)'>VAC OFF</button>
+        </div>
+        <div class="section">
+            <h2>@(localizer["PneumaticaSoffiatore"])</h2>
+            <button class="btn btn-primary" @onclick='() => UpdateAirStatus(true)'>AIR ON</button>
+            <button class="btn btn-primary" @onclick='() => UpdateAirStatus(false)'>AIR OFF</button>
+        </div>
+    </div>
+
+    <div class="right-section">
+        <div class="section">
+            <h2>Input I/O</h2>
+            <div class="signals">
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetInputSignalState(1) ? "green" : "red")"></div>
+                    <span>IN 1: Comando di Stampa STB</span>
+                </div>
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetInputSignalState(2) ? "green" : "red")"></div>
+                    <span>IN 2: Comando di Applica STA</span>
+                </div>
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetInputSignalState(3) ? "green" : "red")"></div>
+                    <span>IN 3: Comando di HOME SHO</span>
+                </div>
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetInputSignalState(4) ? "green" : "red")"></div>
+                    <span>IN 4: Reset Allarmi RES</span>
+                </div>
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetInputSignalState(5) ? "green" : "red")"></div>
+                    <span>IN 5: Richiamo Tipo Bit0 RT0</span>
+                </div>
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetInputSignalState(6) ? "green" : "red")"></div>
+                    <span>IN 6: Richiamo Tipo Bit1 RT1</span>
+                </div>
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetInputSignalState(7) ? "green" : "red")"></div>
+                    <span>IN 7: Richiamo Tipo Bit2 RT2</span>
+                </div>
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetInputSignalState(8) ? "green" : "red")"></div>
+                    <span>IN 8: Etichetta Su Tampone PET</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Output I/O</h2>
+            <div class="signals">
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetOutputSignalState(1) ? "green" : "red")"
+                         @onclick="() => ToggleOutput(1, GetOutputSignalState(1) ? false : true)"></div>
+                    <span>OUT 1: Fine Stampa FOP</span>
+                </div>
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetOutputSignalState(2) ? "green" : "red")"
+                         @onclick="() => ToggleOutput(2, GetOutputSignalState(2) ? false : true)"></div>
+                    <span>OUT 2: Fine Applicazione FAP</span>
+                </div>
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetOutputSignalState(3) ? "green" : "red")"
+                         @onclick="() => ToggleOutput(3, GetOutputSignalState(3) ? false : true)"></div>
+                    <span>OUT 3: HOME Position HOM</span>
+                </div>
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetOutputSignalState(4) ? "green" : "red")"
+                         @onclick="() => ToggleOutput(4, GetOutputSignalState(4) ? false : true)"></div>
+                    <span>OUT 4: READY RDY</span>
+                </div>
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetOutputSignalState(5) ? "green" : "red")"
+                         @onclick="() => ToggleOutput(5, GetOutputSignalState(5) ? false : true)"></div>
+                    <span>OUT 5: Riserva nastro/carta RIS</span>
+                </div>
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetOutputSignalState(6) ? "green" : "red")"
+                         @onclick="() => ToggleOutput(6, GetOutputSignalState(6) ? false : true)"></div>
+                    <span>OUT 6: Fuori Ingombro FIN</span>
+                </div>
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetOutputSignalState(7) ? "green" : "red")"
+                         @onclick="() => ToggleOutput(7, GetOutputSignalState(7) ? false : true)"></div>
+                    <span>OUT 7: Attivazione Aria ATA</span>
+                </div>
+                <div class="signal">
+                    <div class="led" style="background-color: @(GetOutputSignalState(8) ? "green" : "red")"
+                         @onclick="() => ToggleOutput(8, GetOutputSignalState(8) ? false : true)"></div>
+                    <span>OUT 8: Attivazione Vuoto ATV</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>System Reset</h2>
+            <button class="btn btn-primary" @onclick='DOBOTReset'>RESET</button>
+            <button class="btn btn-primary" @onclick='controller.ReturnToHomePosition'>HOME</button>
+        </div>
+    </div>
+</div>
+
+
+@if (showMessage)
+{
+    <div class="alert alert-info">
+        @statusMessage
+    </div>
+}
+
+
+
+
+
+
+<style>
+    .main-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .left-section, .right-section {
+        width: 50%; /* Regola questa percentuale in base alle tue esigenze */
+        padding: 10px;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 100px;
+    }
+
+    .section {
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 5px; 
+        font-size: 10px;
+    }
+
+    .robot-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .control-row {
+        display: flex;
+        gap: 5px;
+    }
+
+    .btn {
+        flex: 1;
+        margin: 0.5px;
+        padding: 0.1rem 0.25rem; /* Regola il padding per centrare il testo 0.5rem 0.75rem */
+        font-size: 16px;
+        width: 150px; /* Imposta la larghezza fissa per tutti i pulsanti */
+    }
+
+    .led-section {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        margin-top: 12px;
+    }
+
+    .led-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 16px;
+    }
+
+    .signals {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+
+    .signal {
+        font-size: 80%;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .led {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-bottom: 5px;
+        background-color: red;
+    }
+
+    h2 {
+        font-size: 14px;
+    }
+
+    .alert {
+        padding: 10px;
+        background-color: #2196F3;
+        color: white;
+        margin-bottom: 15px;
+    }
+
+    .alert-info {
+        background-color: #2196F3;
+    }
+</style>
+
+@code {
+    private bool _currentTestSignal = false;
+    private bool[] inputSignals = new bool[8];
+    private bool[] outputSignals = new bool[8];
+    private double[] TForce = new double[6];
+    private const int SignalsPollingTimer = 500;
+    private int robotMode;
+    private Dictionary<int, string> robotModeDefinitions = new Dictionary<int, string>
+    {
+        { 1, "ROBOT_MODE_INIT" },
+        { 2, "ROBOT_MODE_BRAKE_OPEN" },
+        { 3, "ROBOT_MODE_POWER_STATUS" },
+        { 4, "ROBOT_MODE_DISABLED" },
+        { 5, "ROBOT_MODE_ENABLE" },
+        { 6, "ROBOT_MODE_BACKDRIVE" },
+        { 7, "ROBOT_MODE_RUNNING" },
+        { 8, "ROBOT_MODE_RECORDING" },
+        { 9, "ROBOT_MODE_ERROR" },
+        { 10, "ROBOT_MODE_PAUSE" },
+        { 11, "ROBOT_MODE_JOG" }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var timer = new System.Timers.Timer(SignalsPollingTimer);
+        timer.Elapsed += (s, e) => LoadSignals();
+        timer.AutoReset = true;
+        timer.Start();
+    }
+
+    private void LoadSignals()
+    {
+        inputSignals = controller.GetInputSignals();
+        outputSignals = controller.GetOutputSignals();
+        TForce = controller.GetRobotTCPForce();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private bool GetInputSignalState(int index) => inputSignals[index - 1];
+    private bool GetOutputSignalState(int index) => outputSignals[index - 1];
+    //private double GetInputTForce(int index) => TForce[index - 1];
+
+    private void ToggleOutput(int signalIndex, bool value)
+    {
+        controller.SetDigitalOutput(signalIndex, value);
+    }
+
+    private void MoveJog(JogMovement jogMovement, bool forward)
+    {
+        controller.MoveJog(jogMovement, forward);
+    }
+
+    private async Task DOBOTReset()
+    {
+        ShowStatusMessage("Avvio procedura di Reset Robot. Attendere...");
+        await Task.Delay(1000); // Simula un'attesa per la procedura di reset
+        controller.Reset();
+        ShowStatusMessage("Fine procedura.");
+    }
+
+    private void StopMove()
+    {
+        controller.StopJog();
+    }
+
+    private async Task FormFeed()
+    {
+        await controller.FormFeed();
+    }
+
+    private void UpdateAirStatus(bool value)
+    {
+        controller.UpdateAirStatus(value);
+    }
+
+    private void UpdateVacuumStatus(bool value)
+    {
+        controller.UpdateVacuumStatus(value);
+    }
+
+    private string GetRobotModeText()
+    {
+        //int robotMode = ((int)controller.GetRobotModeLong());
+        if (robotModeDefinitions.ContainsKey(robotMode))
+        {
+            return robotModeDefinitions[robotMode];
+        }
+        return "Unknown";
+    }
+
+    private string GetRobotModeColor()
+    {
+        // Qui puoi decidere il colore in base allo stato. Ad esempio:
+        //int robotMode = ((int)controller.GetRobotModeLong());
+
+        switch (robotMode)
+        {
+            case 1:
+                return "red";
+              
+            case 2:
+                return "red";
+         
+            case 3:
+                return "red";
+              
+            case 4:
+                return "red";
+            
+            case 5:
+                return "green";
+
+            case 6:
+                return "red";
+
+            case 7:
+                return "green";
+
+            case 8:
+                return "red";
+
+            case 9:
+                return "red";
+
+             case 10:
+                return "red";
+
+            case 11:
+                return "red";
+            
+            default:
+                return "red";
+
+        }
+    }
+
+
+
+    private string statusMessage = string.Empty; // Il messaggio di stato
+    private bool showMessage = false; // Controlla la visibilità del messaggio
+    private System.Timers.Timer messageTimer;
+
+    private void ShowStatusMessage(string message)
+    {
+        statusMessage = message;
+        showMessage = true;
+        InvokeAsync(StateHasChanged); // Aggiorna la UI
+
+        // Imposta un timer per nascondere il messaggio dopo qualche secondo
+        messageTimer = new System.Timers.Timer(5000); // 5 secondi
+        messageTimer.Elapsed += (s, e) => HideStatusMessage();
+        messageTimer.AutoReset = false;
+        messageTimer.Start();
+    }
+
+    private void HideStatusMessage()
+    {
+        showMessage = false;
+        InvokeAsync(StateHasChanged); // Aggiorna la UI
+    }
+
+}

@@ -1,0 +1,48 @@
+﻿@inject NavigationManager navigationManager
+
+<div class="flag-container">
+    <img src="images/en-GB.png" class="@(Culture.ToString() == "en-GB" ? "d-none" : "")" @onclick='() => Culture = new CultureInfo("en-GB")' />
+    <img src="images/it-IT.png" class="@(Culture.ToString() == "it-IT" ? "d-none" : "")" @onclick='() => Culture = new CultureInfo("it-IT")' />
+    <img src="images/ar-AE.png" class="@(Culture.ToString() == "ar-AE" ? "d-none" : "")" @onclick='() => Culture = new CultureInfo("ar-AE")' />
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Culture = CultureInfo.CurrentCulture;
+    }
+
+    private CultureInfo Culture
+    {
+        get
+        {
+            return CultureInfo.CurrentCulture;
+        }
+        set
+        {
+            if (CultureInfo.CurrentCulture != value)
+            {
+                var uri = new Uri(navigationManager.Uri).GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+                var cultureEscaped = Uri.EscapeDataString(value.Name);
+                var uriEscaped = Uri.EscapeDataString(uri);
+
+                navigationManager.NavigateTo($"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}", forceLoad: true);
+            }
+        }
+    }
+}
+
+<style>
+    .flag-container {
+        position: absolute;
+        top: 10px;
+        right: 100px;
+    }
+
+    .flag-container img {
+        margin-left: 5px;
+        height: 25px; 
+        cursor: pointer; 
+        border-radius: 5px;
+    }
+</style>

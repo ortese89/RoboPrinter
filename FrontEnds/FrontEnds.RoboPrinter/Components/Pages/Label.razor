@@ -1,0 +1,111 @@
+﻿@page "/label"
+
+@using Entities
+@using BackEnds.RoboPrinter.Models
+@using BackEnds.RoboPrinter.Models.Dto
+@using static UseCases.core.IRobotService
+
+@inject Controller controller
+@inject IJSRuntime jsRuntime
+@inject IStringLocalizer<Common> localizer
+
+<PageTitle>Labels</PageTitle>
+
+<style>
+    .custom-table th:nth-child(1),
+    .custom-table td:nth-child(1) {
+        width: 10%;
+    }
+
+    .custom-table th:nth-child(2),
+    .custom-table td:nth-child(2) {
+        width: 20%;
+    }
+
+    .custom-table th:nth-child(3),
+    .custom-table td:nth-child(3) {
+        width: 70%;
+    }
+
+    /* Altezza fissa con scorrimento verticale */
+    textarea {
+        height: 500px; /* Altezza iniziale della textarea */
+        max-height: 300px; /* Altezza massima della textarea */
+        overflow-y: auto; /* Abilita lo scorrimento verticale */
+    }
+</style>
+
+@if (_labels.Any())
+{
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped custom-table">
+                <thead>
+                    <tr>
+                        <th>@localizer["ID"]</th>
+                        <th>@localizer["Descrizione"]</th>
+                        <th>@localizer["Contenuto"]</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var label in _labels)
+                    {
+                        <tr>
+                            <td><input type="number" class="form-control" readonly @bind="label.Id" /></td>
+                            <td><input type="text" class="form-control" readonly @bind="label.ProductDescription" /></td>
+                            <td><textarea class="form-control" readonly>@label.Content</textarea></td>
+                            <td>
+                                <button class="btn btn-primary" @onclick="() => LoadFile(label.Id)">@localizer["Carica"]</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<InputFile OnChange="HandleFileUpload" hidden accept="@(string.Join(",", _allowedExtensions))" />
+
+@code {
+    private LabelDto[] _labels { get; set; } = [];
+    private int _labelIdToUpload;
+    private string[] _allowedExtensions = [".txt", ".prn", ".ini"];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadLabels();
+    }
+
+    private async Task LoadLabels()
+    {
+        _labelIdToUpload = 0;
+        _labels = await controller.GetLabels();
+    }
+
+    private async Task LoadFile(int labelId)
+    {
+        _labelIdToUpload = labelId;
+        await jsRuntime.InvokeVoidAsync("eval", $"document.querySelector('input[type=\"file\"]').click()");
+    }
+
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        if (e.File is null || !IsFileExtensionSupported(e.File.Name) || _labelIdToUpload == 0) return;
+        using var reader = new StreamReader(e.File.OpenReadStream());
+        var fileContent = await reader.ReadToEndAsync();
+
+        if (!string.IsNullOrEmpty(fileContent))
+        {
+            await controller.UpdateLabel(_labelIdToUpload, fileContent);
+            await LoadLabels();
+        }
+    }
+
+    private bool IsFileExtensionSupported(string fileName)
+    {
+        var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
+        return _allowedExtensions.Contains(fileExtension);
+    }
+}

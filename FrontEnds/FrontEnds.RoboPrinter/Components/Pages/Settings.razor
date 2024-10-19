@@ -1,0 +1,119 @@
+﻿@page "/settings"
+@using BackEnds.RoboPrinter.Models.Dto
+
+@rendermode InteractiveServer
+
+@inject Controller controller
+@inject IStringLocalizer<Common> localizer
+
+<PageTitle>@localizer["Impostazioni"]</PageTitle>
+
+<h1>@localizer["Impostazioni"]</h1>
+
+<div class="container">
+    <div class="section">
+        <h2>@localizer["ModalitaOperativa"]</h2>
+        <div class="form-group">
+            <label for="currentMode">@localizer["ModalitaCorrente"]</label>
+            <div id="currentMode" class="form-control readonly">@_activeOperativeModeDescription</div>
+        </div>
+        <div class="form-group">
+            <label for="operationMode">@localizer["SelezionareModalitaOperativa"]</label>
+            <select class="form-control" @bind="_selectedOperativeModeId">
+                <option value="0">@localizer["SelezionaModalitaOperativa"]</option>
+                @foreach (var operativeMode in _operativeModes)
+                {
+                    <option value="@operativeMode.Id">@operativeMode.Description</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <input type="checkbox" id="useDigitalIO" @bind="_areDigitalIOSignalsEnabled" />
+            <label for="useDigitalIO">@localizer["I/ODigitali"]</label>
+        </div>
+        <div class="form-group">
+            <input type="checkbox" id="executeEntireCycle" @bind="_executeEntireCycleEnabled" />
+            <label for="executeEntireCycle">@localizer["Autoapplicazione"]</label>
+        </div>
+        <div class="form-group">
+            <input type="checkbox" id="impulsive" @bind="_areImpulsiveEnabled" />
+            <label for="executeEntireCycle">@localizer["ModalitaImpulsiva"]</label>
+        </div>
+        <div class="form-group text-right">
+            <button class="btn btn-primary" @onclick="ApplySettings">@localizer["Applica"]</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private OperativeModeDto[] _operativeModes = [];
+    private int _selectedOperativeModeId = 0;
+    private bool _areDigitalIOSignalsEnabled = false;
+    private bool _executeEntireCycleEnabled = false;
+    private bool _areImpulsiveEnabled = false;
+    private string _activeOperativeModeDescription = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _operativeModes = await controller.GetOperativeModes();
+
+        // Nascosto CSEProtocol dall'elenco selezionabile
+        _operativeModes = _operativeModes.Where(x => x.Id != 2).ToArray();
+
+        _areDigitalIOSignalsEnabled = await controller.AreDigitalIOSignalsEnabled();
+        _executeEntireCycleEnabled = await controller.IsExecuteEntireCycleEnabled();
+        await GetActiveOperativeMode();
+    }
+
+    private async Task GetActiveOperativeMode()
+    {
+        _selectedOperativeModeId = await controller.GetActiveOperativeMode();
+        var activeOperativeMode = _operativeModes.FirstOrDefault(x => x.Id == _selectedOperativeModeId);
+        _activeOperativeModeDescription = activeOperativeMode is null ? string.Empty : activeOperativeMode.Description;
+    }
+
+    private async Task ApplySettings()
+    {
+        bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Sei sicuro di voler applicare le modifiche?");
+        if (confirmed)
+        {
+            await controller.SaveOperativeMode(_selectedOperativeModeId, _areDigitalIOSignalsEnabled, _executeEntireCycleEnabled);
+            await GetActiveOperativeMode();
+        }
+    }
+}
+
+<style>
+    .container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 100px;
+    }
+
+    .section {
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .form-group {
+        margin-bottom: 10px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 5px;
+    }
+
+    .readonly {
+        background-color: #e9ecef;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+</style>
