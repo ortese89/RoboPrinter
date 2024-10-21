@@ -51,7 +51,10 @@ INSERT INTO RouteTypes (Description) VALUES
 INSERT INTO AppSettings (Description, Value, DataTypeId) VALUES 
 ('ActiveOperativeMode', '1', 1),
 ('ActiveProduct', '1', 1),
-('DigitalIOSignalsEnabled', 'false', 4);
+('DigitalIOSignalsEnabled', 'false', 4),
+('LastExecutedRoute', '0', 1),
+('LastExecutedRouteStep', '0', 1),
+('ExecuteEntireCycleEnabled', 'false', 4);
 
 INSERT INTO Labels (ProductId, Content) VALUES 
 (1, 'SIZE 41.2 mm, 23 mm
