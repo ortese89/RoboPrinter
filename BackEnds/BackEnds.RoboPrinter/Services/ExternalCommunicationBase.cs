@@ -93,7 +93,7 @@ public abstract class ExternalCommunicationBase : IExternalDeviceCommunication
     {
         var matchedCommand = CSECommands.Keys.FirstOrDefault(k => message.StartsWith(k));
 
-        if (matchedCommand is null) return;
+        //if (matchedCommand is null) return;
 
         switch (matchedCommand)
         {
