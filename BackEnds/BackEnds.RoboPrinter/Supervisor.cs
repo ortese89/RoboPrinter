@@ -90,6 +90,9 @@ public class Supervisor : IHostedService
         };
 
         _robotService.Load(parameters);
+
+        /////////////_robotService.SetUserFrame(0, 0, 0, 0, 0);
+        ////////////_robotService.SetToolFrame(0, 0, 0, 0, 0);
     }
 
     private void InitializeExternalDevice()
@@ -315,8 +318,9 @@ public class Supervisor : IHostedService
         _logger.LogInformation("OnResetRequested");
         //_externalDevice?.Reset();
         //_ioExternalCommunication.Reset();
-        _robotService.ResetAlarms();
-        _robotService.ClearAlarms(); 
+        _robotService.FullReset();
+        //_robotService.ResetAlarms();
+        //_robotService.ClearAlarms(); 
         var printerStatus = _printerService.GetStatus();
         _logger.LogInformation("Printer Reset returned status: {PrinterStatus}", printerStatus);
 

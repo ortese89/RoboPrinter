@@ -563,4 +563,15 @@ public class Dobot : IRobotService
         if (_debugMode) return;
         _dobotMove.StopMoveJog();
     }
+    public void SetToolFrame(int Tool, int X, int Y, int Z, int R)
+    {
+        if (_debugMode) return;
+        _dashboard.SetToolFrame(Tool, X, Y, Z, R);
+    }
+
+    public void SetUserFrame(int Frame, int X, int Y, int Z, int R)
+    {
+        if (_debugMode) return;
+        _dashboard.SetUserFrame(Frame, X, Y, Z, R);
+    }
 }

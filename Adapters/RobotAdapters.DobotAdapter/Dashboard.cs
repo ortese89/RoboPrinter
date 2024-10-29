@@ -190,11 +190,6 @@ class Dashboard : DobotClient
         return WaitReply(5000);
     }
 
-
-
-
-
-
 public async Task<string> DigitalOutputs(int index, bool status, bool swap)
 {
     if (!IsConnected())
@@ -258,16 +253,6 @@ private async Task<string> WaitReplyAsync(int timeoutMs)
     return await Task.Run(() => WaitReply(timeoutMs));
 }
 
-
-
-
-
-
-
-
-
-
-
 /// <summary>
 /// 设置末端数字输出端口状态（队列指令）
 /// </summary>
@@ -305,6 +290,7 @@ public string ToolDO(int index, bool status)
 
         return WaitReply(5000);
     }
+    
     public string GetRobotMode()
     {
         if (!IsConnected())
@@ -320,7 +306,6 @@ public string ToolDO(int index, bool status)
 
         return WaitReply(5000);
     }
-
 
     public string StartDrag()
     {
@@ -346,6 +331,37 @@ public string ToolDO(int index, bool status)
         }
 
         string str = "StopDrag()";
+        if (!SendData(str))
+        {
+            return str + ":send error";
+        }
+
+        return WaitReply(20000);
+    }
+
+    public string SetUserFrame(int Nframe, int X, int Y, int Z, int R)
+    {
+        if (!IsConnected())
+        {
+            return "device does not connected!!!";
+        }
+
+        string str = String.Format("SetUser({0},{1},{2},{3},{4})", Nframe, X, Y, Z, R);
+        if (!SendData(str))
+        {
+            return str + ":send error";
+        }
+
+        return WaitReply(20000);
+    }
+    public string SetToolFrame(int Ntool, int X, int Y, int Z, int R)
+    {
+        if (!IsConnected())
+        {
+            return "device does not connected!!!";
+        }
+
+        string str = String.Format("SetUser({0},{1},{2},{3},{4})", Ntool, X, Y, Z, R);
         if (!SendData(str))
         {
             return str + ":send error";

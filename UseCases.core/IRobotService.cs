@@ -46,6 +46,8 @@ public interface IRobotService
     void ResetAlarms();
     void SetDigitalOutput(int index, bool value);
     Task SetDigitalOutput(int index, bool value, bool swap);
+    void SetToolFrame(int Tool, int X, int Y, int Z, int R);
+    void SetUserFrame(int Frame, int X, int Y, int Z, int R);
     void SetSpeedRatio(int value);
     void StartDrag();
     void StopDrag();
