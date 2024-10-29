@@ -44,6 +44,7 @@
     <div class="col text-end">
         <div class="btn-group me-2" role="group">
             <button class="btn btn-primary me-2" @onclick="ExecuteCycle">@localizer["TEST CICLO"]</button>
+            <button class="btn btn-primary me-2" @onclick="() => ToggleAutomaticCycle(autoCycleToggle)">@localizer["CICLO CONTINUO ON/OFF"]</button> 
         </div>
 
         <div class="btn-group me-2" role="group">
@@ -303,6 +304,7 @@
     bool isUpdating = false;
     private int _activeOperativeModeId = 0;
     private int _robotOverride = 50;
+    private bool autoCycleToggle = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -405,24 +407,34 @@
         _routeStepsApply = await controller.GetRouteSteps(_selectedProductId, 2);
     }
 
-    private void ExecuteCycle()
+    private async Task ExecuteCycle()
     {
-        if (_selectedProductId == 0) return;
-        _cts = new();
-        Task.Run(() => controller.SimulateCycle(_selectedProductId));
-    }
-
-    private void ToggleAutomaticCycle(bool start)
-    {
-        if (start)
+        bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Confermi?");
+        if (confirmed)
         {
             if (_selectedProductId == 0) return;
             _cts = new();
-            Task.Run(() => controller.ToggleAutomaticCycle(_selectedProductId, _cts.Token));
+            await Task.Run(() => controller.SimulateCycle(_selectedProductId));            
         }
-        else
+    }
+
+    private async Task ToggleAutomaticCycle(bool startAndStop)
+    {
+        bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Confermi?");
+        if (confirmed)
         {
-            _cts.Cancel();
+            autoCycleToggle = !startAndStop;
+
+            if (autoCycleToggle)
+            {
+                if (_selectedProductId == 0) return;
+                _cts = new();
+                await Task.Run(() => controller.ToggleAutomaticCycle(_selectedProductId, _cts.Token));
+            }
+            else
+            {
+                _cts.Cancel();
+            }
         }
     }
 
