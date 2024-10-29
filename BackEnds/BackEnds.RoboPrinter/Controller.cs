@@ -50,6 +50,8 @@ public class Controller
         _ioExternalCommunication = ioExternalCommunication;
         Task.Run(CheckHomePosition);
         _externalDeviceCommunication = externalDeviceCommunication;
+        MoveJog(JogMovement.X, true);
+        StopJog();
     }
 
     public async Task AddNewRouteStep(RouteStepDto routeStepDto)
@@ -448,10 +450,12 @@ public class Controller
     {
         return _robotService.Status;
     }
+    
     public double[] GetRobotTCPForce()
     {
         return _robotService.GetRobotTCPForce();
     }
+    
     public int GetRobotSpeed()
     {
         return _robotService.GetSpeedRatio();
