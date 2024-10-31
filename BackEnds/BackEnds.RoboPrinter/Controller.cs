@@ -390,9 +390,11 @@ public class Controller
             _robotService.SetDigitalOutput((int)DigitalOutputs.PrinterLowMaterial, false);
         }
 
-        //_robotService.SetDigitalOutput(DigitalOutputs.Ready, true);
-        //    per gestione segnale di ready
-        _robotService.SetDigitalOutput(DigitalOutputs.Ready, true, true);
+        if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
+        {
+			// Gestione segnale di ready
+			_robotService.SetDigitalOutput(DigitalOutputs.Ready, true, true);
+        }
     }
 
     private void ResetPrinter()
@@ -593,29 +595,26 @@ public class Controller
                 _applicationRouteHomePosition = await _viewModel.GetApplicationRouteHomePosition(_viewModel.ActiveProductId);
             }
 
-            bool isNearHome = RobotPosition.AreNear(_robotService.CurrentPosition, _applicationRouteHomePosition, 0.1f);
-            if (isNearHome)
+            if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
             {
-                if (!_robotService.ReadDigitalOutput(DigitalOutputs.Home))
-                {
-                    _robotService.SetDigitalOutput(DigitalOutputs.Home, true);
-                }
-            }
-            else
-            {
-                if (_robotService.ReadDigitalOutput(DigitalOutputs.Home))
-                {
-                    _robotService.SetDigitalOutput(DigitalOutputs.Home, false);
-                }
-            }
+				bool isNearHome = RobotPosition.AreNear(_robotService.CurrentPosition, _applicationRouteHomePosition, 0.1f);
+				if (isNearHome)
+				{
+					if (!_robotService.ReadDigitalOutput(DigitalOutputs.Home))
+					{
+						_robotService.SetDigitalOutput(DigitalOutputs.Home, true);
+					}
+				}
+				else
+				{
+					if (_robotService.ReadDigitalOutput(DigitalOutputs.Home))
+					{
+						_robotService.SetDigitalOutput(DigitalOutputs.Home, false);
+					}
+				}
+			}
 
             double[] TForce = _robotService.GetRobotTCPForce();
-            //const int RobotAxis = 6;
-
-            //for (int index = 0; index < RobotAxis; index++)
-            //{
-            //    Debug.WriteLine("DOBOT_Current{0}: {1}", index, TForce[index]);
-            //}
 
             await Task.Delay(1000);
         }

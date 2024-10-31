@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using UseCases.core;
 using BackEnds.RoboPrinter.Models;
 using BackEnds.RoboPrinter.RobotModels;
+using System.Configuration;
 
 namespace BackEnds.RoboPrinter.Services.IServices;
 
@@ -16,19 +17,21 @@ public class CycleService : ICycleService
     private readonly ILogger<CycleService> _logger;
     private readonly IRobotService _robotService;
     private readonly IPrinterService _printerService;
-    private readonly ViewModel _viewModel;
+	private readonly IConfiguration _configuration;
+	private readonly ViewModel _viewModel;
     private int _activeOperativeModeId = 0;
     private CancellationTokenSource _cts = new();
 
     public bool IsCycling { get; private set; } = false;
 
-    public CycleService(ILogger<CycleService> logger, IRobotService robotService, IPrinterService printerService, ViewModel viewModel)
+    public CycleService(ILogger<CycleService> logger, IRobotService robotService, IPrinterService printerService, ViewModel viewModel, IConfiguration configuration)
     {
         _logger = logger;
         _robotService = robotService;
         _printerService = printerService;
         _viewModel = viewModel;
-    }
+		_configuration = configuration;
+	}
 
     public async Task<OperationStatus> ExecutePrintCycle(int productId, string serialNumber, int activeOperativeMode, string labelContent)
     {
@@ -69,11 +72,17 @@ public class CycleService : ICycleService
             else if (printerStatus == PrinterStatus.PaperLow || printerStatus == PrinterStatus.RibbonLow)
             {
                 _logger.LogInformation("Printer status is: {Printerstatus} - Raising Digital Output signal...", printerStatus);
-                _robotService.SetDigitalOutput(DigitalOutputs.PrinterLowMaterial, true);
+                if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
+                {
+                    _robotService.SetDigitalOutput(DigitalOutputs.PrinterLowMaterial, true);
+                }
             }
             else if (printerStatus == PrinterStatus.OK)
             {
-                _robotService.SetDigitalOutput(DigitalOutputs.PrinterLowMaterial, false);
+                if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
+                {
+                    _robotService.SetDigitalOutput(DigitalOutputs.PrinterLowMaterial, false);
+                }
             }
 
             await _viewModel.AddNewHistory(productId, serialNumber, activeOperativeMode);
@@ -204,8 +213,10 @@ public class CycleService : ICycleService
                         _logger.LogInformation("PrepareForLabelPick - Failed MoveToPosition");
                         return status;
                     }
-
-                    _robotService.SetDigitalOutput(DigitalOutputs.Safe, step.ClearZone);
+                    if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
+                    {
+                        _robotService.SetDigitalOutput(DigitalOutputs.Safe, step.ClearZone);
+                    }
                     await _viewModel.SaveLastExecutedRouteStep(step.Id);
                 }
 
@@ -268,7 +279,10 @@ public class CycleService : ICycleService
                             _logger.LogInformation("ReturnToPickHomePosition - Failed MoveToPosition");
                             return status;
                         }
-                        _robotService.SetDigitalOutput(DigitalOutputs.Safe, step.ClearZone);
+                        if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
+                        {
+                            _robotService.SetDigitalOutput(DigitalOutputs.Safe, step.ClearZone);
+                        }
                         await _viewModel.SaveLastExecutedRouteStep(step.Id);
                     }
                 }
@@ -411,7 +425,10 @@ public class CycleService : ICycleService
                         _logger.LogInformation("ApplyLabel - Failed MoveToPosition");
                         return status;
                     }
-                    _robotService.SetDigitalOutput(DigitalOutputs.Safe, step.ClearZone);
+                    if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
+                    {
+                        _robotService.SetDigitalOutput(DigitalOutputs.Safe, step.ClearZone);
+                    }
                     await _viewModel.SaveLastExecutedRouteStep(step.Id);
                 }
             }
@@ -445,8 +462,10 @@ public class CycleService : ICycleService
                     _logger.LogInformation("ApplyLabel - Failed MoveToPosition");
                     return status;
                 }
-
-                _robotService.SetDigitalOutput(DigitalOutputs.Safe, step.ClearZone);
+                if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
+                {
+                    _robotService.SetDigitalOutput(DigitalOutputs.Safe, step.ClearZone);
+                }
                 await _viewModel.SaveLastExecutedRouteStep(step.Id);
             }
         }
@@ -572,7 +591,10 @@ public class CycleService : ICycleService
                     _logger.LogInformation("ReturnToHome - Failed MoveToPosition");
                     return;
                 }
-                _robotService.SetDigitalOutput(DigitalOutputs.Safe, step.ClearZone);
+                if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
+                {
+                    _robotService.SetDigitalOutput(DigitalOutputs.Safe, step.ClearZone);
+                }
                 await _viewModel.SaveLastExecutedRouteStep(step.Id);
             }
         }
@@ -588,7 +610,10 @@ public class CycleService : ICycleService
             {
                 //_robotService.SetSpeedRatio(step.Speed);
                 MoveToPosition(step);
-                _robotService.SetDigitalOutput(DigitalOutputs.Safe, step.ClearZone);
+                if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
+                {
+                    _robotService.SetDigitalOutput(DigitalOutputs.Safe, step.ClearZone);
+                }
                 await _viewModel.SaveLastExecutedRouteStep(step.Id);
             }            
         }
@@ -596,7 +621,10 @@ public class CycleService : ICycleService
         {
             //_robotService.SetSpeedRatio(lastStep.Speed);
             MoveToPosition(lastStep);
-            _robotService.SetDigitalOutput(DigitalOutputs.Safe, lastStep.ClearZone);
+            if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
+            {
+                _robotService.SetDigitalOutput(DigitalOutputs.Safe, lastStep.ClearZone);
+            }
         }
 
         /////////////////////////////////////////////////////////////_robotService.SetDigitalOutput(DigitalOutputs.Home, true);

@@ -361,7 +361,16 @@
     {
         inputSignals = controller.GetInputSignals();
         outputSignals = controller.GetOutputSignals();
-        TAngle = controller.GetAngle();
+
+        if (controller.GetRobotStatus() == "DragMode")
+        {
+            TAngle = controller.GetAngle();
+        }
+        else
+        {
+            TAngle = [0, 0, 0, 0, 0, 0];
+        }
+
         TForce = controller.GetRobotTCPForce();
         InvokeAsync(StateHasChanged);
     }

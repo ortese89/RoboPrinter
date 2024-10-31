@@ -118,9 +118,12 @@ public class Supervisor : IHostedService
         _ioExternalCommunication.ResetRequested += OnResetRequested;
         _ioExternalCommunication.Connect();
         _logger.LogInformation($"InitializeIOCommunication - connection completed");
-        //_robotService.SetDigitalOutput(DigitalOutputs.Ready, true);
-        //    per gestione segnale di ready
-        _robotService.SetDigitalOutput(DigitalOutputs.Ready, true, true);
+        
+        if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
+        {
+			// Gestione segnale di ready
+			_robotService.SetDigitalOutput(DigitalOutputs.Ready, true, true);
+		}
     }
 
     #region EventHandlers
