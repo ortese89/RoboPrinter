@@ -15,47 +15,36 @@
         <div class="section">
             <h2>Robot Status</h2>
             <div style="display: flex; align-items: center; justify-content: space-between;">
-                <!-- Stato di connessione (20%) -->
+                <!-- Stato di connessione (10%) -->
                 <div class="led-container" style="flex: 0 0 20%; display: flex; align-items: center; gap: 10px;">
                     <div class="led" style="width: 20px; height: 20px; background-color: @(controller.IsRobotConnected() ? "green" : "red");"></div>
                     <label>Connected</label>
                 </div>
 
-                <!-- Stato del robot (60%) -->
-                <div style="flex: 0 0 60%; font-size: 30px; display: flex; align-items: center; gap: 10px;">
+                <!-- Stato del robot (50%) -->
+                <div style="flex: 0 0 30%; font-size: 30px; display: flex; align-items: center; gap: 10px;">
                     <label>STATUS:</label>
                     <label>@(controller.GetRobotStatus())</label>
                 </div>
 
-                <!-- Assorbimenti degli assi (20%) -->
-                <div style="flex: 0 0 20%; font-size: 12px; display: flex; flex-direction: column;">
-                    <div style="display: inline-block; margin-bottom: 5px;">
-                        <label>@(localizer["AssorbimentoAsseJ1"])</label>
-                        <label>@(Math.Round(TForce[0], 3))</label>
-                    </div>
-                    <div style="display: inline-block; margin-bottom: 5px;">
-                        <label>@(localizer["AssorbimentoAsseJ2"])</label>
-                        <label>@(Math.Round(TForce[1], 3))</label>
-                    </div>
-                    <div style="display: inline-block; margin-bottom: 5px;">
-                        <label>@(localizer["AssorbimentoAsseJ3"])</label>
-                        <label>@(Math.Round(TForce[2], 3))</label>
-                    </div>
-                    <div style="display: inline-block; margin-bottom: 5px;">
-                        <label>@(localizer["AssorbimentoAsseJ4"])</label>
-                        <label>@(Math.Round(TForce[3], 3))</label>
-                    </div>
-                    <div style="display: inline-block; margin-bottom: 5px;">
-                        <label>@(localizer["AssorbimentoAsseJ5"])</label>
-                        <label>@(Math.Round(TForce[4], 3))</label>
-                    </div>
-                    <div style="display: inline-block;">
-                        <label>@(localizer["AssorbimentoAsseJ6"])</label>
-                        <label>@(Math.Round(TForce[5], 3))</label>
-                    </div>
+                <!-- Tabella degli assorbimenti degli assi (40%) -->
+                <div style="flex: 0 0 50%; display: grid; grid-template-columns: 1fr 1fr 1fr; font-size: 18px; text-align: center;">
+                    <!-- Intestazione della tabella -->
+                    <div><strong>Asse</strong></div>
+                    <div><strong>Gradi</strong></div>
+                    <div><strong>Assorbimento</strong></div>
+
+                    <!-- Righe dei dati per ogni asse -->
+                    @for (int i = 0; i < 6; i++)
+                    {
+                        <div>@(localizer[$"J{i + 1}"])</div>
+                        <div>@(Math.Round(TAngle[i], 3))</div>
+                        <div>@(Math.Round(TForce[i], 3))</div>
+                    }
                 </div>
             </div>
         </div>
+
 
 
         @if (userData.Roles.Contains(Utility.SD.AdminRole))
@@ -341,6 +330,7 @@
     private bool _currentTestSignal = false;
     private bool[] inputSignals = new bool[8];
     private bool[] outputSignals = new bool[8];
+    private double[] TAngle = new double[6];
     private double[] TForce = new double[6];
     private const int SignalsPollingTimer = 500;
     private int robotMode;
@@ -371,6 +361,7 @@
     {
         inputSignals = controller.GetInputSignals();
         outputSignals = controller.GetOutputSignals();
+        TAngle = controller.GetAngle();
         TForce = controller.GetRobotTCPForce();
         InvokeAsync(StateHasChanged);
     }

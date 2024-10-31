@@ -44,7 +44,8 @@
     <div class="col text-end">
         <div class="btn-group me-2" role="group">
             <button class="btn btn-primary me-2" @onclick="ExecuteCycle">@localizer["TEST CICLO"]</button>
-            <button class="btn btn-primary me-2" @onclick="() => ToggleAutomaticCycle(autoCycleToggle)">@localizer["CICLO CONTINUO ON/OFF"]</button> 
+            <button class="btn btn-primary me-2" @onclick="() => ToggleAutomaticCycle(autoCycleToggle)">@localizer["CICLO [1] ON/OFF"]</button> 
+            <button class="btn btn-primary me-2" @onclick="() => ToggleAutomaticCycle3(autoCycleToggle)">@localizer["CICLO [3] ON/OFF"]</button> 
         </div>
 
         <div class="btn-group me-2" role="group">
@@ -53,7 +54,7 @@
         </div>
         <div class="btn-group" role="group">
             <button class="btn btn-primary me-2" @onclick="DOBOTReset">RESET</button>
-            <button class="btn btn-primary" @onclick="controller.ReturnToHomePosition">HOME</button>
+            <button class="btn btn-primary" @onclick="DOBOTHome">HOME</button>
         </div
         @if (showMessage)
             {
@@ -412,6 +413,8 @@
         bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Confermi?");
         if (confirmed)
         {
+            controller.SetDobotSpeed(_robotOverride);
+
             if (_selectedProductId == 0) return;
             _cts = new();
             await Task.Run(() => controller.SimulateCycle(_selectedProductId));            
@@ -423,6 +426,8 @@
         bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Confermi?");
         if (confirmed)
         {
+            controller.SetDobotSpeed(_robotOverride);
+
             autoCycleToggle = !startAndStop;
 
             if (autoCycleToggle)
@@ -437,6 +442,37 @@
             }
         }
     }
+
+    private async Task ToggleAutomaticCycle3(bool startAndStop)
+    {
+        bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Confermi?");
+        if (confirmed)
+        {
+            controller.SetDobotSpeed(_robotOverride);
+
+            autoCycleToggle = !startAndStop;
+
+            if (autoCycleToggle)
+            {
+                if (_selectedProductId == 0) return;
+
+                ProductDto[] Products = await controller.GetProducts();
+                if (Products.Count() >= 3)
+                {
+                    _cts = new();
+                    await Task.Run(() => controller.ToggleAutomaticCycle3(_cts.Token));
+                }
+            }
+            else
+            {
+                _cts.Cancel();
+            }
+        }
+    }
+
+
+
+
 
     private string GetBackgroundColor(RobotPoint value)
     {
@@ -529,10 +565,19 @@
     private async Task DOBOTReset()
     {
         ShowStatusMessage("Avvio procedura di Reset Robot. Attendere...");
-        await Task.Delay(1000); // Simula un'attesa per la procedura di reset
+        _cts.Cancel();
+        autoCycleToggle = false;
+        await Task.Delay(500);
         controller.Reset();
         ShowStatusMessage("Fine procedura.");
     }
+
+    private async Task DOBOTHome()
+    {
+        controller.SetDobotSpeed(_robotOverride);
+        await controller.ReturnToHomePosition();
+    }
+
 
     private bool IsUserEnabled()
     {

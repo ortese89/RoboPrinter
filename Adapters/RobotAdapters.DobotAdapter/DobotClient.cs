@@ -31,18 +31,32 @@ public abstract class DobotClient
 
     public bool Connect(string ipAddress, int port)
     {
-        if (_socketClient is not null && IsConnected())
+        try
         {
-            if (ipAddress != _ipAddress || port != _port)
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("DobotClient_Connect");
+
+            if (_socketClient is not null && IsConnected())
             {
-                this.Disconnect();
+                if (ipAddress != _ipAddress || port != _port)
+                {
+                    this.Disconnect();
+                }
+                else
+                {
+                    return true;
+                }
             }
-            else
-            {
-                return true;
-            }
+            return this.ConnectDobotServer(ipAddress, port);
         }
-        return this.ConnectDobotServer(ipAddress, port);
+        catch (Exception ex)
+        {
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("DobotClient_Connect: " + ex.ToString());
+
+            return false;
+        }
+
     }
 
     private bool ConnectDobotServer(string ipAddress, int port)
@@ -71,7 +85,8 @@ public abstract class DobotClient
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Connect failed: {ex.Message}");
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("DobotClient_ConnectDobotServer: " + ex.ToString());
         }
 
         return false;
@@ -84,12 +99,16 @@ public abstract class DobotClient
     {
         try
         {
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("DobotClient_Connect");
+
             _socketClient?.Shutdown(SocketShutdown.Both);
             _socketClient?.Close();
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine("close socket:" + ex.ToString());
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("DobotClient_Disconnect: " + ex.ToString());
         }
     }
 
@@ -114,7 +133,8 @@ public abstract class DobotClient
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine(ex.ToString());
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("DobotClient_IsConnected: " + ex.ToString());
         }
         return false;
     }
@@ -134,8 +154,8 @@ public abstract class DobotClient
     {
         try
         {
-           /////////////////////
-           System.Diagnostics.Debug.WriteLine("DOBOT_out: " + str);
+           //DEBUG LOG
+           System.Diagnostics.Debug.WriteLine("DobotClient_SendData: " + str);
 
 
             byte[] data = Encoding.UTF8.GetBytes(str);
@@ -151,7 +171,8 @@ public abstract class DobotClient
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine("send error:" + ex.ToString());
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("DobotClient_SendData: " + ex.ToString());
         }
         return false;
     }
@@ -166,18 +187,21 @@ public abstract class DobotClient
             {
                 _socketClient.ReceiveTimeout = timeoutMillisecond;
             }
-            //byte[] buffer = new byte[1024];
-            byte[] buffer = new byte[64];
+            byte[] buffer = new byte[1024];
+            //byte[] buffer = new byte[64];
             int length = _socketClient.Receive(buffer);
             string str = Encoding.UTF8.GetString(buffer, 0, length);
 
-            //////////////////////
-            System.Diagnostics.Debug.WriteLine("DOBOT_in: " + str);
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("DobotClient_WaitReply: " + str);
 
             return str;
         }
         catch (SocketException ex)
         {
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("DobotClient_Skt_WaitReply: " + ex.ToString());
+
             if (NetworkErrorEvent is not null && !IsConnected())
             {
                 NetworkErrorEvent(this, ex.SocketErrorCode);
@@ -192,7 +216,9 @@ public abstract class DobotClient
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Send error: {ex.Message}");
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("DobotClient_WaitReply: " + ex.ToString());
+
             return $"Send error: {ex.Message}";
         }
     }
@@ -221,11 +247,15 @@ public abstract class DobotClient
             {
                 NetworkErrorEvent(this, ex.SocketErrorCode);
             }
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("DobotClient_Skt_Receive: " + ex.ToString());
+
             return -1;
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Receive error: {ex.Message}");
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("DobotClient_Receive: " + ex.ToString());
         }
         return 0;
     }

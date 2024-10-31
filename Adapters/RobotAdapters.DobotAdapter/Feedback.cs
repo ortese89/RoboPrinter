@@ -43,7 +43,7 @@ class Feedback : DobotClient
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("close thread:" + ex.ToString());
+                //LOG System.Diagnostics.Debug.WriteLine("close thread:" + ex.ToString());
             }
         }
     }
@@ -112,7 +112,7 @@ class Feedback : DobotClient
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("recv thread:" + ex.ToString());
+                //LOG System.Diagnostics.Debug.WriteLine("recv thread:" + ex.ToString());
             }
         }
     }

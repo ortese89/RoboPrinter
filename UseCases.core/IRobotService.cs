@@ -36,6 +36,7 @@ public interface IRobotService
     void Disconnect();
     void Enable();
     void FullReset();
+    double[] GetAngle();
     double[] GetRobotTCPForce();
     int GetSpeedRatio();
     void MoveJog(JogMovement jogMovement, bool forward);

@@ -290,7 +290,23 @@ public string ToolDO(int index, bool status)
 
         return WaitReply(5000);
     }
-    
+
+    public string GetAngle()
+    {
+        if (!IsConnected())
+        {
+            return "device does not connected!!!";
+        }
+
+        string str = "GetAngle()";
+        if (!SendData(str))
+        {
+            return str + ":send error";
+        }
+
+        return WaitReply(5000);
+    }
+
     public string GetRobotMode()
     {
         if (!IsConnected())

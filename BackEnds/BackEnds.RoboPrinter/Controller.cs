@@ -96,7 +96,7 @@ public class Controller
 
     public void MoveJog(JogMovement jogMovement, bool forward)
     {
-        _robotService.MoveJog(jogMovement, forward);
+			_robotService.MoveJog(jogMovement, forward);
     }
 
     public void StopJog()
@@ -324,6 +324,26 @@ public class Controller
         }
     }
 
+    public async Task ToggleAutomaticCycle3(CancellationToken ct)
+    {
+        while (!ct.IsCancellationRequested)
+        {
+            ProductDto[] Products = await GetProducts();
+            ct.ThrowIfCancellationRequested(); //Verifica del Token tra le Operazioni per rendere più reattiva la cancellazione
+            if (Products.Count() >= 3)
+            {
+                for (int index = 0; index < 3; index++)
+                {
+                    System.Diagnostics.Debug.WriteLine("Avvio: " + index);
+                    await SaveActiveProduct(Products[index].Id);
+                    ct.ThrowIfCancellationRequested(); //Verifica del Token tra le Operazioni per rendere più reattiva la cancellazione
+                    await SimulateCycle(Products[index].Id);
+                    ct.ThrowIfCancellationRequested(); //Verifica del Token tra le Operazioni per rendere più reattiva la cancellazione
+                }
+            }
+        }
+    }
+
     public async Task SimulateCycle(int productId)
     {
         if (_activeOperativeModeId == 0)
@@ -455,7 +475,11 @@ public class Controller
     {
         return _robotService.GetRobotTCPForce();
     }
-    
+    public double[] GetAngle()
+    {
+        return _robotService.GetAngle();
+    }
+
     public int GetRobotSpeed()
     {
         return _robotService.GetSpeedRatio();

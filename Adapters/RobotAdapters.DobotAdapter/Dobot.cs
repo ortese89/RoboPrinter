@@ -317,6 +317,43 @@ public class Dobot : IRobotService
         return _dashboard.GetErrorID();
     }
 
+    public double[] GetAngle()
+    {
+        if (_debugMode) return new double[0];
+
+        try
+        {
+			// Ottiene la stringa dal metodo _dashboard.GetAngle()
+			string angleData = _dashboard.GetAngle();
+
+			// Verifica se la stringa è nel formato previsto
+			if (!string.IsNullOrEmpty(angleData) && angleData.Contains("{") && angleData.Contains("}"))
+			{
+				// Estrae la parte di stringa tra { e }
+				int start = angleData.IndexOf('{') + 1;
+				int end = angleData.IndexOf('}');
+				string valuesString = angleData.Substring(start, end - start);
+
+				// Divide i valori separati da virgola e li converte in double[]
+				string[] values = valuesString.Split(',');
+				double[] angles = Array.ConvertAll(values, value => double.Parse(value, CultureInfo.InvariantCulture));
+
+				return angles;
+			}
+			else
+			{
+				return [0,0,0,0,0,0];
+				// Gestisce il caso in cui la stringa non sia nel formato atteso
+				//////throw new FormatException("La stringa restituita non è nel formato previsto.");
+			}
+		}
+        catch (Exception ex)
+        {
+			return [0, 0, 0, 0, 0, 0];
+		}
+    }
+
+
     public long GetRobotMode()
     {
         if (_debugMode) return -1;
@@ -402,6 +439,9 @@ public class Dobot : IRobotService
 
     private void ResetErrors()
     {
+        //DEBUG LOG
+        System.Diagnostics.Debug.WriteLine("Dobot=ResetErrors()");
+
         string errorId = GetErrorID();
 
         if (!errorId.Contains(NoErrorCode))
@@ -434,23 +474,52 @@ public class Dobot : IRobotService
 
     private void ActivateRobot()
     {
+        ///Thread.Sleep(1000);
+        //DEBUG LOG
+        System.Diagnostics.Debug.WriteLine("Dobot=ActivateRobot()");
+
+
         string errorId = GetErrorID();
+
+        //if (!errorId.Contains("GetErrorID"))
+        //{
+        //    return;
+        //}
+
         if (!errorId.Contains(NoErrorCode))
         {
-            Thread.Sleep(1000);
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("Dobot=Errori ancora presenti");
+
+            //////////////////////////////////////////////////////////////////////////////////////Thread.Sleep(1000);
             // FUNGO di EMERGENZA
             if (errorId.Contains(emergencyStopPressedCode))
             {
+                //DEBUG LOG
+                System.Diagnostics.Debug.WriteLine("Dobot=Fungo Emergenza Attivo");
                 return;
             }
-            FullReset();
+            ///////////////////////////////////////////////////////////////////////////////////////FullReset();
         }
 
 
         var currentMode = GetRobotMode();
 
+        //DEBUG LOG
+        System.Diagnostics.Debug.WriteLine("Dobot=Mode= " + currentMode);
+
+        if (currentMode == (int)States.Error)
+        {
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("Dobot=Mode_Error");
+            FullReset();
+            return;
+        }
+
         if (currentMode == (int)States.PowerOff)
         {
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("Dobot=Mode_PowerOff");
             PowerOn();
         }
 
@@ -463,12 +532,18 @@ public class Dobot : IRobotService
             errorId = GetErrorID();
             if (!errorId.Contains(NoErrorCode))
             {
+                //DEBUG LOG
+                System.Diagnostics.Debug.WriteLine("Dobot=Nuovo errore durante il PowerOn");
+
                 FullReset();
+                return;
             }
         }
 
         if (currentMode == (int)States.Disabled)
         {
+            //DEBUG LOG
+            System.Diagnostics.Debug.WriteLine("Dobot=Mode_Disable");
             Enable();
         }
 
