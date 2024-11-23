@@ -52,6 +52,7 @@ public class Supervisor : IHostedService
         _areDigitalIOSignalsEnabled = await _viewModel.GetDigitalIOSignalsConfiguration();
         _executeEntireCycleEnabled = await _viewModel.GetCycleConfiguration();
         await _viewModel.GetActiveProduct();
+        await _viewModel.GetRobotOverride();
         await InitializeRobot();
         _printerService.Connect(_configuration["InternalDevices:Printer:IpAddress"], Convert.ToInt16(_configuration["InternalDevices:Printer:Port"]), Convert.ToBoolean(_configuration["InternalDevices:Robot:DebugMode"]));
         InitializeExternalDevice();
@@ -90,7 +91,7 @@ public class Supervisor : IHostedService
         };
 
         _robotService.Load(parameters);
-
+        _robotService.SetSpeedRatio(_viewModel.RobotOverride);
         /////////////_robotService.SetUserFrame(0, 0, 0, 0, 0);
         ////////////_robotService.SetToolFrame(0, 0, 0, 0, 0);
     }

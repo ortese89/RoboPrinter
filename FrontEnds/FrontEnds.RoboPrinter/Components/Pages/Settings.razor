@@ -77,7 +77,7 @@
         bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Sei sicuro di voler applicare le modifiche?");
         if (confirmed)
         {
-            await controller.SaveOperativeMode(_selectedOperativeModeId, _areDigitalIOSignalsEnabled, _executeEntireCycleEnabled);
+            await controller.SaveSettings(_selectedOperativeModeId, _areDigitalIOSignalsEnabled, _executeEntireCycleEnabled);
             await GetActiveOperativeMode();
         }
     }

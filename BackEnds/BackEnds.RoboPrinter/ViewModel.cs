@@ -19,6 +19,8 @@ public class ViewModel
 
     public int ActiveProductId = 0;
 
+    public int RobotOverride = 0;
+
     #endregion
 
     public ViewModel(ApplicationDbContext context)
@@ -561,6 +563,24 @@ public class ViewModel
         }
     }
 
+    public async Task<int> GetRobotOverride()
+    {
+        await _semaphore.WaitAsync();
+        try
+        {
+            var appSetting = await _context.AppSettings
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Description == "RobotOverride");
+
+            RobotOverride = Convert.ToInt16(appSetting?.Value);
+            return RobotOverride;
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
     public async Task<History[]> GetAllHistories()
     {
         await _semaphore.WaitAsync();
@@ -911,6 +931,27 @@ public class ViewModel
             {
                 appSetting.Value = routeStepId.ToString();
                 await _context.SaveChangesAsync();
+            }
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+    
+    public async Task SaveRobotOverride(int robotOverride)
+    {
+        await _semaphore.WaitAsync();
+        try
+        {
+            var appSetting = await _context.AppSettings
+                .FirstOrDefaultAsync(x => x.Description == "RobotOverride");
+
+            if (appSetting is not null)
+            {
+                appSetting.Value = robotOverride.ToString();
+                await _context.SaveChangesAsync();
+                RobotOverride = robotOverride;
             }
         }
         finally

@@ -487,7 +487,13 @@ public class Controller
         return _robotService.GetSpeedRatio();
     }
 
-    public async Task SaveOperativeMode(int newOperativeModeId, bool digitalIOSignalsEnabled, bool executeEntireCycleEnabled)
+    public async Task<int> GetRobotOverride()
+    {
+        await _viewModel.GetRobotOverride();
+        return _viewModel.RobotOverride;
+    }
+
+    public async Task SaveSettings(int newOperativeModeId, bool digitalIOSignalsEnabled, bool executeEntireCycleEnabled)
     {
         // Aggiorna le impostazioni nel sistema
         // Questa logica può includere la memorizzazione delle impostazioni in un database,
@@ -576,9 +582,10 @@ public class Controller
         _logger.LogInformation("Robot shutdown!");
     }
 
-    public void SetDobotSpeed(int speed)
+    public async Task SetDobotSpeed(int speed)
     {
        _robotService.SetSpeedRatio(speed);
+        await _viewModel.SaveRobotOverride(speed);
     }
 
     private async Task CheckHomePosition()

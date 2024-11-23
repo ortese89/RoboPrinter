@@ -49,12 +49,13 @@ INSERT INTO RouteTypes (Description) VALUES
 ('Application Route');
 
 INSERT INTO AppSettings (Description, Value, DataTypeId) VALUES 
-('ActiveOperativeMode', '1', 1),
-('ActiveProduct', '1', 1),
+('ActiveOperativeMode', '3', 1),
+('ActiveProduct', '7', 1),
 ('DigitalIOSignalsEnabled', 'false', 4),
 ('LastExecutedRoute', '0', 1),
-('LastExecutedRouteStep', '0', 1),
-('ExecuteEntireCycleEnabled', 'false', 4);
+('LastExecutedRouteStep', '1', 1),
+('ExecuteEntireCycleEnabled', 'false', 4),
+('RobotOverride', '100', 1);
 
 INSERT INTO Labels (ProductId, Content) VALUES 
 (1, 'SIZE 41.2 mm, 23 mm

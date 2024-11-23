@@ -304,8 +304,11 @@
     private RobotPosition _currentRobotPosition = new();
     bool isUpdating = false;
     private int _activeOperativeModeId = 0;
-    private int _robotOverride = 50;
+    private int _robotOverride = 0;
     private bool autoCycleToggle = false;
+    private string statusMessage = string.Empty;
+    private bool showMessage = false; 
+    private System.Timers.Timer messageTimer;
 
     protected override async Task OnInitializedAsync()
     {
@@ -318,7 +321,7 @@
         };
         robotReadingTimer.AutoReset = true;
         robotReadingTimer.Start();
-        _robotOverride = controller.GetRobotSpeed();
+        _robotOverride = await controller.GetRobotOverride();
     }
 
     private async Task LoadProducts()
@@ -413,7 +416,7 @@
         bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Confermi?");
         if (confirmed)
         {
-            controller.SetDobotSpeed(_robotOverride);
+            await controller.SetDobotSpeed(_robotOverride);
 
             if (_selectedProductId == 0) return;
             _cts = new();
@@ -426,7 +429,7 @@
         bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Confermi?");
         if (confirmed)
         {
-            controller.SetDobotSpeed(_robotOverride);
+            await controller.SetDobotSpeed(_robotOverride);
 
             autoCycleToggle = !startAndStop;
 
@@ -448,7 +451,7 @@
         bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Confermi?");
         if (confirmed)
         {
-            controller.SetDobotSpeed(_robotOverride);
+            await controller.SetDobotSpeed(_robotOverride);
 
             autoCycleToggle = !startAndStop;
 
@@ -469,10 +472,6 @@
             }
         }
     }
-
-
-
-
 
     private string GetBackgroundColor(RobotPoint value)
     {
@@ -554,11 +553,11 @@
         return !(_activeOperativeModeId == 1);
     }
 
-    private void UpdateRobotOverride(ChangeEventArgs e)
+    private async void UpdateRobotOverride(ChangeEventArgs e)
     {
         _robotOverride = int.Parse(e.Value.ToString());
 
-        controller.SetDobotSpeed(_robotOverride);
+        await controller.SetDobotSpeed(_robotOverride);
     }
 
 
@@ -574,7 +573,7 @@
 
     private async Task DOBOTHome()
     {
-        controller.SetDobotSpeed(_robotOverride);
+        await controller.SetDobotSpeed(_robotOverride);
         await controller.ReturnToHomePosition();
     }
 
@@ -583,11 +582,6 @@
     {
         return userData.Roles.Contains(Utility.SD.AdminRole);
     }
-
-
-    private string statusMessage = string.Empty; // Il messaggio di stato
-    private bool showMessage = false; // Controlla la visibilità del messaggio
-    private System.Timers.Timer messageTimer;
 
     private void ShowStatusMessage(string message)
     {
