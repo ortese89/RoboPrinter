@@ -582,7 +582,7 @@ public class Controller
         _logger.LogInformation("Robot shutdown!");
     }
 
-    public async Task SetDobotSpeed(int speed)
+    public async Task SetRobotSpeed(int speed)
     {
        _robotService.SetSpeedRatio(speed);
         await _viewModel.SaveRobotOverride(speed);

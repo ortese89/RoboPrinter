@@ -416,7 +416,7 @@
         bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Confermi?");
         if (confirmed)
         {
-            await controller.SetDobotSpeed(_robotOverride);
+            await controller.SetRobotSpeed(_robotOverride);
 
             if (_selectedProductId == 0) return;
             _cts = new();
@@ -429,7 +429,7 @@
         bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Confermi?");
         if (confirmed)
         {
-            await controller.SetDobotSpeed(_robotOverride);
+            await controller.SetRobotSpeed(_robotOverride);
 
             autoCycleToggle = !startAndStop;
 
@@ -451,7 +451,7 @@
         bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Confermi?");
         if (confirmed)
         {
-            await controller.SetDobotSpeed(_robotOverride);
+            await controller.SetRobotSpeed(_robotOverride);
 
             autoCycleToggle = !startAndStop;
 
@@ -557,7 +557,7 @@
     {
         _robotOverride = int.Parse(e.Value.ToString());
 
-        await controller.SetDobotSpeed(_robotOverride);
+        await controller.SetRobotSpeed(_robotOverride);
     }
 
 
@@ -573,7 +573,7 @@
 
     private async Task DOBOTHome()
     {
-        await controller.SetDobotSpeed(_robotOverride);
+        await controller.SetRobotSpeed(_robotOverride);
         await controller.ReturnToHomePosition();
     }
 
