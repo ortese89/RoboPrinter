@@ -384,6 +384,24 @@
     {
         if (_selectedProductId == 0) return;
 
+        ProductDto[] Products = await controller.GetProducts();
+
+        // Trova il prodotto corrispondente all'ID selezionato
+        ProductDto selectedProduct = Products.FirstOrDefault(p => p.Id == _selectedProductId);
+
+        // Se il prodotto esiste e la descrizione è tra quelle specificate, esci dalla funzione
+        string[] templateDescriptions = {
+            "Template00", "Template01", "Template02", 
+            "Template03", "Template04", "Template05", 
+            "Template06", "Template07"
+        };
+
+        if (selectedProduct != null && templateDescriptions.Contains(selectedProduct.Description))
+        {
+            return;
+        }
+
+
         bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Sei sicuro di voler eliminare?");
         if (confirmed)
         {

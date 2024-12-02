@@ -10,6 +10,7 @@ public class IOExternalCommunication
     public event EventHandler ApplyRequested;
     public event EventHandler HomePositionRequested;
     public event EventHandler ResetRequested;
+    public event EventHandler SetProgram;
     private CancellationTokenSource _cts;
     private readonly Dictionary<int, bool> _previousStates = [];
     private readonly IRobotService _robotService;
@@ -128,10 +129,13 @@ public class IOExternalCommunication
                 ResetRequested?.Invoke(this, EventArgs.Empty);
                 break;
             case int index when index == DigitalInputs.Typology0:
+                SetProgram?.Invoke(this, EventArgs.Empty);
                 break;
             case int index when index == DigitalInputs.Typology1:
+                SetProgram?.Invoke(this, EventArgs.Empty);
                 break;
             case int index when index == DigitalInputs.Typology2:
+                SetProgram?.Invoke(this, EventArgs.Empty);
                 break;
             default:
                 break;
@@ -150,10 +154,13 @@ public class IOExternalCommunication
             case int index when index == DigitalInputs.ResetCommand:
                 break;
             case int index when index == DigitalInputs.Typology0:
+                SetProgram?.Invoke(this, EventArgs.Empty);
                 break;
             case int index when index == DigitalInputs.Typology1:
+                SetProgram?.Invoke(this, EventArgs.Empty);
                 break;
             case int index when index == DigitalInputs.Typology2:
+                SetProgram?.Invoke(this, EventArgs.Empty);
                 break;
             default:
                 break;

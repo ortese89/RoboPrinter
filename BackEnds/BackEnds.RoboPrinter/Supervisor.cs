@@ -117,6 +117,7 @@ public class Supervisor : IHostedService
         _ioExternalCommunication.ApplyRequested += OnApplyRequested;
         _ioExternalCommunication.HomePositionRequested += OnHomePositionRequested;
         _ioExternalCommunication.ResetRequested += OnResetRequested;
+        _ioExternalCommunication.SetProgram += OnSetProgram;
         _ioExternalCommunication.Connect();
         _logger.LogInformation($"InitializeIOCommunication - connection completed");
         
@@ -222,6 +223,25 @@ public class Supervisor : IHostedService
         await ExecuteApplyCycle();
     }
 
+    private async void OnSetProgram(object? sender, EventArgs e)
+    {
+        _logger.LogInformation("OnSetProgram");
+        int i = (_robotService.ReadDigitalInput(DigitalInputs.Typology2) ? 1 : 0) << 2 | (_robotService.ReadDigitalInput(DigitalInputs.Typology1) ? 1 : 0) << 1 | (_robotService.ReadDigitalInput(DigitalInputs.Typology0) ? 1 : 0);
+
+        var product = await _viewModel.GetProductByDescription("0" + i + "Template");
+
+        if (product is not null)
+        {
+            _logger.LogError("Found a Product with Description: {Description} - Updating ActiveProduct...", product);
+            await _viewModel.SaveActiveProduct(product.Id);
+        }
+        else
+        {
+            _logger.LogError("Failed to find a Product with Id or Description equal to: {Product}", product);
+        }
+    }
+
+
     private async void OnCSEPrintRequested(object? sender, EventArgs e)
     {
         _activeOperativeModeId = await _viewModel.GetActiveOperativeMode();
@@ -317,14 +337,13 @@ public class Supervisor : IHostedService
         _cycleService.ReturnToHome();
     }
 
-    private void OnResetRequested(object? sender, EventArgs e)
+    private async void OnResetRequested(object? sender, EventArgs e)
     {
         _logger.LogInformation("OnResetRequested");
         //_externalDevice?.Reset();
         //_ioExternalCommunication.Reset();
         _robotService.FullReset();
-        //_robotService.ResetAlarms();
-        //_robotService.ClearAlarms(); 
+        _printerService.Reset();
         var printerStatus = _printerService.GetStatus();
         _logger.LogInformation("Printer Reset returned status: {PrinterStatus}", printerStatus);
 
@@ -336,9 +355,11 @@ public class Supervisor : IHostedService
         {
             _robotService.SetDigitalOutput((int)DigitalOutputs.PrinterLowMaterial, false);
         }
+
+        _robotService.SetSpeedRatio(_viewModel.RobotOverride);
     }
 
-    private void OnStatusRequested(object? sender, EventArgs e)
+    private async void OnStatusRequested(object? sender, EventArgs e)
     {
         _logger.LogInformation("OnStatusRequested");
         var printerStatus = _printerService.GetStatus();

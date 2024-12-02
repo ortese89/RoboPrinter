@@ -377,6 +377,7 @@ public class Controller
         _robotService.FullReset();
         _robotService.SetDigitalOutput(DigitalOutputs.AirActivation, false);
         _robotService.SetDigitalOutput(DigitalOutputs.VacuumActivation, false);
+        
         _printerService.Reset();
         var printerStatus = _printerService.GetStatus();
         _logger.LogInformation("Printer Reset returned status: {PrinterStatus}", printerStatus);
@@ -395,6 +396,8 @@ public class Controller
 			// Gestione segnale di ready
 			_robotService.SetDigitalOutput(DigitalOutputs.Ready, true, true);
         }
+
+        _robotService.SetSpeedRatio(_viewModel.RobotOverride);
     }
 
     private void ResetPrinter()
