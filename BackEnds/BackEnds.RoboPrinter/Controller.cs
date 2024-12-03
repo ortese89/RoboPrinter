@@ -230,7 +230,7 @@ public class Controller
         _printerService.FormFeed();
     }
 
-    public async Task GoToPosition(RobotPosition robotPosition, int routeStepId, int speed)
+    public async Task GoToPosition(RobotPosition robotPosition, int routeStepId, int speed, bool clearZone)
     {
         //////////////_robotService.ResetAlarms();
         //////////////_robotService.ClearAlarms();
@@ -240,6 +240,7 @@ public class Controller
         {
             await _viewModel.SaveLastExecutedRouteStep(routeStepId);
         }
+        _robotService.SetDigitalOutput(DigitalOutputs.Safe, clearZone);
     }
 
     public RobotPosition GetCurrentRobotPosition()
@@ -249,12 +250,24 @@ public class Controller
 
     public async Task UpdateStep(RouteStepDto routeStep)
     {
+        var robotPosition = _robotService.CurrentPosition;
+
         if (routeStep.RobotPoint.PointType.Description == "Home")
         {
             _applicationRouteHomePosition = null;
+
+            // Aggiorno allo stesso valore tutti i punti di tipo HOME ////////////////////////
+            var routeSteps = await _viewModel.GetRouteStepsByProduct(await GetActiveProduct());
+            foreach (var rStep in routeSteps)
+            {
+                if (rStep.RobotPoint.PointType.Description == "Home")
+                {
+                    await _viewModel.UpdateRobotPoint(rStep.RobotPointId, robotPosition);
+                }
+            }
+            ////////////////////////////////////////////////////////////////////////////////////
         }
 
-        var robotPosition = _robotService.CurrentPosition;
         await _viewModel.UpdateRobotPoint(routeStep.RobotPointId, robotPosition);
         await _viewModel.UpdateRouteStep(routeStep.Id, routeStep.Speed, routeStep.ClearZone);
         _robotService.ResetAlarms();
@@ -480,6 +493,7 @@ public class Controller
     {
         return _robotService.GetRobotTCPForce();
     }
+
     public double[] GetAngle()
     {
         return _robotService.GetAngle();
@@ -600,10 +614,10 @@ public class Controller
                 _viewModel.ActiveProductId = await _viewModel.GetActiveProduct();
             }
 
-            if (_applicationRouteHomePosition is null)
-            {
+            //if (_applicationRouteHomePosition is null)
+            //{
                 _applicationRouteHomePosition = await _viewModel.GetApplicationRouteHomePosition(_viewModel.ActiveProductId);
-            }
+            //}
 
             if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
             {

@@ -44,8 +44,8 @@
     <div class="col text-end">
         <div class="btn-group me-2" role="group">
             <button class="btn btn-primary me-2" @onclick="ExecuteCycle">@localizer["TEST CICLO"]</button>
-            <button class="btn btn-primary me-2" @onclick="() => ToggleAutomaticCycle(autoCycleToggle)">@localizer["CICLO [1] ON/OFF"]</button> 
-            <button class="btn btn-primary me-2" @onclick="() => ToggleAutomaticCycle3(autoCycleToggle)">@localizer["CICLO [3] ON/OFF"]</button> 
+            <!--<button class="btn btn-primary me-2" @onclick="() => ToggleAutomaticCycle(autoCycleToggle)">@localizer["CICLO [1] ON/OFF"]</button>-->
+            <!--<button class="btn btn-primary me-2" @onclick="() => ToggleAutomaticCycle3(autoCycleToggle)">@localizer["CICLO [3] ON/OFF"]</button>-->
         </div>
 
         <div class="btn-group me-2" role="group">
@@ -357,7 +357,7 @@
     private async Task GoToPosition(RouteStepDto routeStepDto)
     {
         var robotPosition = new RobotPosition(routeStepDto.RobotPoint.X, routeStepDto.RobotPoint.Y, routeStepDto.RobotPoint.Z, routeStepDto.RobotPoint.Yaw, routeStepDto.RobotPoint.Pitch, routeStepDto.RobotPoint.Roll);
-        await controller.GoToPosition(robotPosition, routeStepDto.Id, routeStepDto.Speed);
+        await controller.GoToPosition(robotPosition, routeStepDto.Id, routeStepDto.Speed, routeStepDto.ClearZone);
     }
 
     private async Task SaveRouteStep(RouteStepDto routeStepDto)

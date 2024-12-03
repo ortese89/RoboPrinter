@@ -228,7 +228,7 @@ public class Supervisor : IHostedService
         _logger.LogInformation("OnSetProgram");
         int i = (_robotService.ReadDigitalInput(DigitalInputs.Typology2) ? 1 : 0) << 2 | (_robotService.ReadDigitalInput(DigitalInputs.Typology1) ? 1 : 0) << 1 | (_robotService.ReadDigitalInput(DigitalInputs.Typology0) ? 1 : 0);
 
-        var product = await _viewModel.GetProductByDescription("0" + i + "Template");
+        var product = await _viewModel.GetProductByDescription("Template0" + i);
 
         if (product is not null)
         {
