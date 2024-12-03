@@ -55,6 +55,29 @@ public class TcpExternalCommunication : ExternalCommunicationBase
         }
     }
 
+    //private async Task HandleClientAsync(TcpClient client)
+    //{
+    //    try
+    //    {
+    //        using var networkStream = client.GetStream();
+    //        var reader = new StreamReader(networkStream, Encoding.UTF8);
+
+    //        while (client.Connected)
+    //        {
+    //            var buffer = new char[1024];
+    //            int bytesRead = await reader.ReadAsync(buffer, 0, buffer.Length);
+    //            if (bytesRead == 0) break;
+    //            ProcessData(new string(buffer, 0, bytesRead));
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Console.WriteLine($"HandleClientAsync {ex.Message}");
+    //    }
+    //}
+
+    private string _dataBuffer = "";
+
     private async Task HandleClientAsync(TcpClient client)
     {
         try
@@ -67,7 +90,31 @@ public class TcpExternalCommunication : ExternalCommunicationBase
                 var buffer = new char[1024];
                 int bytesRead = await reader.ReadAsync(buffer, 0, buffer.Length);
                 if (bytesRead == 0) break;
-                ProcessData(new string(buffer, 0, bytesRead));
+
+                // Accumula i dati ricevuti nel buffer
+                _dataBuffer += new string(buffer, 0, bytesRead);
+
+                // Processa i messaggi completi nel buffer
+                while (_dataBuffer.Contains('\u0002') && _dataBuffer.Contains('\u0003'))
+                {
+                    int startIndex = _dataBuffer.IndexOf('\u0002'); // Trova STX
+                    int endIndex = _dataBuffer.IndexOf('\u0003', startIndex); // Trova ETX dopo STX
+
+                    if (endIndex > startIndex)
+                    {
+                        // Estrai il messaggio tra STX ed ETX
+                        var message = _dataBuffer.Substring(startIndex + 1, endIndex - startIndex - 1);
+                        _dataBuffer = _dataBuffer.Substring(endIndex + 1); // Rimuovi il messaggio elaborato
+
+                        // Processa il messaggio
+                        ProcessData(message.Trim());
+                    }
+                    else
+                    {
+                        // Se manca ETX, aspetta ulteriori dati
+                        break;
+                    }
+                }
             }
         }
         catch (Exception ex)
@@ -75,6 +122,8 @@ public class TcpExternalCommunication : ExternalCommunicationBase
             Console.WriteLine($"HandleClientAsync {ex.Message}");
         }
     }
+
+
 
     public override void Disconnect()
     {

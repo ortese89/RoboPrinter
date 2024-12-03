@@ -38,7 +38,7 @@ public abstract class ExternalCommunicationBase : IExternalDeviceCommunication
         {"^A*", "Recall a page from drive (UTF8)" },
         {"^|i ", "Unput of Variable Data from Serial in a previously loaded Format Page" },
         {"^V", "Processing and generation of a page ready for printing" },
-        {"^X", "Reset command. Exit from fault error situation" },
+        {"^R", "Reset command. Exit from fault error situation" },
         {"^XX", "Reset command. Exit from fault error situation with Zebra emulation" },
         {"^z", "Reprocessing, printing and application for 3 sides applicators" },
         {"^Z", "Application only command for 3 sides applicators" },
@@ -77,7 +77,7 @@ public abstract class ExternalCommunicationBase : IExternalDeviceCommunication
                 break;
 
             case "^@":
-            case "^X":
+            case "^R":
                 ResetRequested?.Invoke(this, new ExternalDeviceEventArgs());
                 break;
 
@@ -107,7 +107,7 @@ public abstract class ExternalCommunicationBase : IExternalDeviceCommunication
                 LoadProductRequested?.Invoke(this, new ExternalDeviceEventArgs(productIdAsString));
                 break;
 
-            case "^X":
+            case "^R":
                 ResetRequested?.Invoke(this, new ExternalDeviceEventArgs());
                 break;
 
