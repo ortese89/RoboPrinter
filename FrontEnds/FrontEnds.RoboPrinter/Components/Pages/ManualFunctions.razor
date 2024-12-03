@@ -19,16 +19,22 @@
                 <div class="led-container" style="flex: 0 0 20%; display: flex; align-items: center; gap: 10px;">
                     <div class="led" style="width: 20px; height: 20px; background-color: @(controller.IsRobotConnected() ? "green" : "red");"></div>
                     <label>Connected</label>
+                    <p></p>
+                    <div class="led" style="width: 20px; height: 20px; background-color: @(controller.IsRobotInError() ? "green" : "red");"></div>
+                    <label>Error</label>
+
                 </div>
 
                 <!-- Stato del robot (50%) -->
-                <div style="flex: 0 0 30%; font-size: 30px; display: flex; align-items: center; gap: 10px;">
-                    <label>STATUS:</label>
-                    <label>@(controller.GetRobotStatus())</label>
+                <div style="flex: 0 0 30%; font-size: 30px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <label>STATUS:</label>
+                        <label>@(controller.GetRobotStatus())</label>
+                    </div>
                 </div>
 
                 <!-- Tabella degli assorbimenti degli assi (40%) -->
-                <div style="flex: 0 0 50%; display: grid; grid-template-columns: 1fr 1fr 1fr; font-size: 18px; text-align: center;">
+                <div style="flex: 0 0 30%; display: grid; grid-template-columns: 1fr 1fr 1fr; font-size: 18px; text-align: center;">
                     <!-- Intestazione della tabella -->
                     <div><strong>Asse</strong></div>
                     <div><strong>Gradi</strong></div>

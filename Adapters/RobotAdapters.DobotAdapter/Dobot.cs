@@ -4,6 +4,8 @@ using System.Globalization;
 using UseCases.core;
 using static UseCases.core.IRobotService;
 using System.Timers;
+using log4net.Core;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RobotAdapters.DobotAdapter;
 
@@ -16,6 +18,7 @@ public class Dobot : IRobotService
     private bool _IsEnabled = false;
     private bool _IsDisabled = false;
     private bool _IsInError = false;
+    private string _errorCode = "";
     private const int TimeoutMovement = 30000;
     private const int FeedbackPort = 30004;
     private const int MovePort = 30003;
@@ -115,6 +118,14 @@ public class Dobot : IRobotService
         get
         {
             return ((States)_robotMode).ToString();
+        }
+    }
+
+    public string ErrorCode
+    {
+        get
+        {
+            return _errorCode;
         }
     }
     public RobotPosition CurrentPosition
@@ -353,12 +364,12 @@ public class Dobot : IRobotService
 		}
     }
 
-
     public long GetRobotMode()
     {
         if (_debugMode) return -1;
         return _robotMode;
     }
+    
     public double[] GetRobotTCPForce()
     {
         //if (_debugMode) return -1;
@@ -446,27 +457,6 @@ public class Dobot : IRobotService
 
         if (!errorId.Contains(NoErrorCode))
         {
-
-
-            if (errorId.Contains(emergencyStopPressedCode))
-            {
-                // devo chiedere di sbloccare il FUNGO di EMERGENZA
-                //return;
-            }
-
-            if (errorId.Contains(elbowSingularityCode))
-            {
-                // errore di Singolarità
-                //return;
-            }
-
-            if (errorId.Contains(emergencyStopPressedCode) || 
-                errorId.Contains(emergencyStopTriggeredCode) || 
-                errorId.Contains(abnormalEmergencyStopCode))
-            {
-                //ERRORE DI EMERGENZA
-            }
-
             ResetAlarms();
             ClearAlarms();
         }
@@ -474,10 +464,8 @@ public class Dobot : IRobotService
 
     private void ActivateRobot()
     {
-        ///Thread.Sleep(1000);
         //DEBUG LOG
         System.Diagnostics.Debug.WriteLine("Dobot=ActivateRobot()");
-
 
         string errorId = GetErrorID();
 
@@ -491,15 +479,15 @@ public class Dobot : IRobotService
             //DEBUG LOG
             System.Diagnostics.Debug.WriteLine("Dobot=Errori ancora presenti");
 
-            //////////////////////////////////////////////////////////////////////////////////////Thread.Sleep(1000);
             // FUNGO di EMERGENZA
             if (errorId.Contains(emergencyStopPressedCode))
             {
+                _errorCode = "emergencyStop";
                 //DEBUG LOG
                 System.Diagnostics.Debug.WriteLine("Dobot=Fungo Emergenza Attivo");
                 return;
             }
-            ///////////////////////////////////////////////////////////////////////////////////////FullReset();
+            ////////////////////FullReset();
         }
 
 
@@ -638,6 +626,7 @@ public class Dobot : IRobotService
         if (_debugMode) return;
         _dobotMove.StopMoveJog();
     }
+    
     public void SetToolFrame(int Tool, int X, int Y, int Z, int R)
     {
         if (_debugMode) return;
@@ -649,4 +638,42 @@ public class Dobot : IRobotService
         if (_debugMode) return;
         _dashboard.SetUserFrame(Frame, X, Y, Z, R);
     }
+
+
+    //string errorId = GetErrorID();
+
+    //if (!errorId.Contains(NoErrorCode))
+    //{
+    //    //DEBUG LOG
+    //    System.Diagnostics.Debug.WriteLine("Dobot=Errori ancora presenti");
+
+
+    //    if (errorId.Contains(emergencyStopTriggeredCode))
+    //    {
+    //        // FUNGO di EMERGENZA intervenuto
+    //        _errorCode = "emergencyStopTrg";
+    //        //return;
+    //    }
+
+    //    if (errorId.Contains(elbowSingularityCode))
+    //    {
+    //        // errore di Singolarità
+    //        _errorCode = "elbowSingularity";
+    //        //return;
+    //    }
+
+    //    if (errorId.Contains(abnormalEmergencyStopCode))
+    //    {
+    //        // errore di abnormal Emergency
+    //        _errorCode = "abEmergencyStop";
+    //    }
+    //    if (errorId.Contains(emergencyStopPressedCode))
+    //    {
+    //        _errorCode = "emergencyStop";
+    //        //DEBUG LOG
+    //    }
+
+    //}
+
+
 }

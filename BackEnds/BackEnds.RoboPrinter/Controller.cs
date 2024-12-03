@@ -488,6 +488,11 @@ public class Controller
     {
         return _robotService.Status;
     }
+
+    public string GetRobotErrorCode()
+    {
+        return _robotService.ErrorCode;
+    }
     
     public double[] GetRobotTCPForce()
     {

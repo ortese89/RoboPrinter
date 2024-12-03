@@ -24,6 +24,7 @@ public interface IRobotService
     bool IsDisabled { get; }
     bool IsInError { get; }
     string Status { get; }
+    string ErrorCode { get; }
     RobotPosition CurrentPosition { get; }
     OperationStatus Load(Dictionary<string, string> parameters);
     OperationStatus MoveLinearToPosition(RobotPosition robotPosition);

@@ -478,6 +478,6 @@ class Feedback : DobotClient
     }
     public bool IsInError()
     {
-        return FeedbackData.ROBOT_MODE_ERROR == FeedbackData.RobotMode;
+        return FeedbackData.ErrorStatus == 1;
     }
 }

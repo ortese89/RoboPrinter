@@ -116,18 +116,18 @@ public abstract class DobotClient
     {
         try
         {
-            if ((_socketClient is null || !_socketClient.Connected) && _port != 29999)
-            {
-                int port = _port;
-            }
-            if (_port == 29999 )
-            {
-                if (_socketClient is null || !_socketClient.Connected)
-                {
-                    this.ConnectDobotServer(_ipAddress, _port);
-                    return false;
-                }
-            }
+            //////////////////////////////////////////////if ((_socketClient is null || !_socketClient.Connected) && _port != 29999)
+            //////////////////////////////////////////////{
+            //////////////////////////////////////////////    int port = _port;
+            //////////////////////////////////////////////}
+            //////////////////////////////////////////////if (_port == 29999 )
+            //////////////////////////////////////////////{
+            //////////////////////////////////////////////    if (_socketClient is null || !_socketClient.Connected)
+            //////////////////////////////////////////////    {
+            //////////////////////////////////////////////        this.ConnectDobotServer(_ipAddress, _port);
+            //////////////////////////////////////////////        return false;
+            //////////////////////////////////////////////    }
+            //////////////////////////////////////////////}
           
             return _socketClient is not null && _socketClient.Connected;
         }
