@@ -565,6 +565,10 @@ public class Controller
             await _viewModel.SaveActiveProduct(newActiveProduct);
 
             _applicationRouteHomePosition = null;
+
+            // Se cambio prodotto, azzero l'ultimo stepid salvato su DB
+            await _viewModel.SaveLastExecutedRouteStep(0);
+            ///////////////////////////////////////////////////////////
         }
     }
 

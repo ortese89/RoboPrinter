@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Net.NetworkInformation;
 using UseCases.core;
+using static System.Net.WebRequestMethods;
 
 #endregion
 
@@ -234,6 +235,10 @@ public class Supervisor : IHostedService
         {
             _logger.LogError("Found a Product with Description: {Description} - Updating ActiveProduct...", product);
             await _viewModel.SaveActiveProduct(product.Id);
+
+            // Se cambio prodotto, azzero l'ultimo stepid salvato su DB
+            await _viewModel.SaveLastExecutedRouteStep(0);
+            ///////////////////////////////////////////////////////////
         }
         else
         {
@@ -302,7 +307,11 @@ public class Supervisor : IHostedService
     private async void OnLoadProductRequested(object? sender, ExternalDeviceEventArgs e)
     {
         _logger.LogInformation("OnLoadProductRequested - Received ProductId {ProductId}...", e.Content);
-        
+
+        // Se cambio prodotto, azzero l'ultimo stepid salvato su DB
+        await _viewModel.SaveLastExecutedRouteStep(0);
+        ///////////////////////////////////////////////////////////
+
         if (int.TryParse(e.Content, out int newProductId))
         {
             var product = await _viewModel.GetProductById(newProductId);
@@ -343,6 +352,7 @@ public class Supervisor : IHostedService
         //_externalDevice?.Reset();
         //_ioExternalCommunication.Reset();
         _robotService.FullReset();
+
         _printerService.Reset();
         var printerStatus = _printerService.GetStatus();
         _logger.LogInformation("Printer Reset returned status: {PrinterStatus}", printerStatus);
@@ -355,6 +365,8 @@ public class Supervisor : IHostedService
         {
             _robotService.SetDigitalOutput((int)DigitalOutputs.PrinterLowMaterial, false);
         }
+        _robotService.SetDigitalOutput(DigitalOutputs.AirActivation, false);
+        _robotService.SetDigitalOutput(DigitalOutputs.VacuumActivation, false);
 
         _robotService.SetSpeedRatio(_viewModel.RobotOverride);
     }

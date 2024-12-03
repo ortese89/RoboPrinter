@@ -523,9 +523,26 @@ public class CycleService : ICycleService
 
         int lastRouteStepId = await _viewModel.GetLastExecutedRouteStep();
 
+
         if (lastRouteStepId == 0)
         {
             _logger.LogInformation("ReturnToHomePosition - Last Route Step Id is 0");
+
+            // lastRouteStepId è 0; quindi devo tornare in Home senza ripercorrere le routes
+            int prog = await _viewModel.GetActiveProduct();
+            var rSteps = await _viewModel.GetRouteStepsByProduct(prog);
+            var hStep = rSteps.FirstOrDefault(x => x.RobotPoint.PointType.Description == "Home");
+            if (hStep is not null)
+            {
+                MoveToPosition(hStep);
+
+                await _viewModel.SaveLastExecutedRouteStep(hStep.Id);
+
+                if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
+                {
+                    _robotService.SetDigitalOutput(DigitalOutputs.Safe, hStep.ClearZone);
+                }
+            }
             return;
         }
 
