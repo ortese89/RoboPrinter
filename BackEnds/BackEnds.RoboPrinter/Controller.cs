@@ -24,7 +24,7 @@ public class Controller
     private readonly IPrinterService _printerService;
     private readonly IConfiguration _configuration;
     private readonly ViewModel _viewModel;
-    private readonly ICycleService _cycleService;
+    private ICycleService _cycleService;
     private readonly IOExternalCommunication _ioExternalCommunication;
     private readonly IExternalDeviceCommunication _externalDeviceCommunication;
     private readonly GPIOManager _gpioManager;
@@ -34,7 +34,7 @@ public class Controller
     private bool _isExecuteEntireCycleEnabled = false;
     private string _manualSerialNumber = string.Empty;
     private RobotPosition? _applicationRouteHomePosition;
-    public bool IsCycling { get; private set; } = false;
+    public bool IsCycling { get; set; } = false;
 
     public Controller(ILogger<Controller> logger, IRobotService robotService, IPrinterService printerService,
         IConfiguration configuration, ViewModel viewModel, ICycleService cycleService, 
@@ -386,7 +386,7 @@ public class Controller
     public void Reset()
     {
         _logger.LogInformation("Resetting...");
-        IsCycling = false;
+        _cycleService.IsCycling = false;
         _robotService.FullReset();
         _robotService.SetDigitalOutput(DigitalOutputs.AirActivation, false);
         _robotService.SetDigitalOutput(DigitalOutputs.VacuumActivation, false);

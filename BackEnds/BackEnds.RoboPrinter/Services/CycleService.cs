@@ -21,8 +21,7 @@ public class CycleService : ICycleService
 	private readonly ViewModel _viewModel;
     private int _activeOperativeModeId = 0;
     private CancellationTokenSource _cts = new();
-
-    public bool IsCycling { get; private set; } = false;
+    public bool IsCycling { get;  set; } = false;
 
     public CycleService(ILogger<CycleService> logger, IRobotService robotService, IPrinterService printerService, ViewModel viewModel, IConfiguration configuration)
     {

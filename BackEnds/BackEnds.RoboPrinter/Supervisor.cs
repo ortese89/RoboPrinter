@@ -25,7 +25,7 @@ public class Supervisor : IHostedService
     private readonly ViewModel _viewModel;
     private readonly IOExternalCommunication _ioExternalCommunication;
     private readonly GPIOManager _gpioManager;
-    private readonly ICycleService _cycleService;
+    private ICycleService _cycleService;
     private int _activeOperativeModeId;
     private string _currentSerialNumber = string.Empty;
     private bool _areDigitalIOSignalsEnabled = false;
@@ -351,6 +351,10 @@ public class Supervisor : IHostedService
         _logger.LogInformation("OnResetRequested");
         //_externalDevice?.Reset();
         //_ioExternalCommunication.Reset();
+
+        _cycleService.IsCycling = false;
+
+
         _robotService.FullReset();
 
         _printerService.Reset();
