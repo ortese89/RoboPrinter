@@ -36,7 +36,7 @@
             <label for="executeEntireCycle">@localizer["Autoapplicazione"]</label>
         </div>
         <div class="form-group">
-            <input type="checkbox" id="impulsive" @bind="_areImpulsiveEnabled" />
+            <input type="checkbox" id="impulsive" @bind="_areDigitalIOSignalsImpulsiveEnabled" />
             <label for="executeEntireCycle">@localizer["ModalitaImpulsiva"]</label>
         </div>
         <div class="form-group text-right">
@@ -49,8 +49,8 @@
     private OperativeModeDto[] _operativeModes = [];
     private int _selectedOperativeModeId = 0;
     private bool _areDigitalIOSignalsEnabled = false;
+    private bool _areDigitalIOSignalsImpulsiveEnabled = false;
     private bool _executeEntireCycleEnabled = false;
-    private bool _areImpulsiveEnabled = false;
     private string _activeOperativeModeDescription = string.Empty;
 
     protected override async Task OnInitializedAsync()
@@ -61,6 +61,7 @@
         _operativeModes = _operativeModes.Where(x => x.Id != 2).ToArray();
 
         _areDigitalIOSignalsEnabled = await controller.AreDigitalIOSignalsEnabled();
+        _areDigitalIOSignalsImpulsiveEnabled = await controller.AreDigitalIOSignalsImpulsiveEnabled();
         _executeEntireCycleEnabled = await controller.IsExecuteEntireCycleEnabled();
         await GetActiveOperativeMode();
     }
@@ -77,7 +78,7 @@
         bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "Sei sicuro di voler applicare le modifiche?");
         if (confirmed)
         {
-            await controller.SaveSettings(_selectedOperativeModeId, _areDigitalIOSignalsEnabled, _executeEntireCycleEnabled);
+            await controller.SaveSettings(_selectedOperativeModeId, _areDigitalIOSignalsEnabled, _executeEntireCycleEnabled, _areDigitalIOSignalsImpulsiveEnabled);
             await GetActiveOperativeMode();
         }
     }

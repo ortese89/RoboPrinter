@@ -167,8 +167,8 @@ public class IOExternalCommunication
         }
     }
 
-    private int GetTypology()
-    {
-        return (_robotService.ReadDigitalInput(DigitalInputs.Typology2) ? 1 : 0) << 2 | (_robotService.ReadDigitalInput(DigitalInputs.Typology1) ? 1 : 0) << 1 | (_robotService.ReadDigitalInput(DigitalInputs.Typology0) ? 1 : 0);
-    }
+    //private int GetTypology()
+    //{
+    //    return (_robotService.ReadDigitalInput(DigitalInputs.Typology2) ? 1 : 0) << 2 | (_robotService.ReadDigitalInput(DigitalInputs.Typology1) ? 1 : 0) << 1 | (_robotService.ReadDigitalInput(DigitalInputs.Typology0) ? 1 : 0);
+    //}
 }

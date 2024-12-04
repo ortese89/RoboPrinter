@@ -183,13 +183,29 @@ public class Supervisor : IHostedService
             {
                 _ioExternalCommunication.LabelPrinted(status);
 
-                if (_executeEntireCycleEnabled)
+                ////////////// Controllo segnale impulsivo //////////////////////////////////////////////////////////////
+                bool _areDigitalIOSignalsImpulsiveEnabled = await _viewModel.GetDigitalIOSignalsImpulsiveConfiguration();
+                if (_areDigitalIOSignalsImpulsiveEnabled)
+                {
+                    await Task.Run(ResetLabelPrinted);
+                }
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                
+                    if (_executeEntireCycleEnabled)
                 {
                     var statusApply = await _cycleService.ExecuteApplyCycle(_viewModel.ActiveProductId, "99999999", _activeOperativeModeId);
 
                     if (statusApply == OperationStatus.OK)
                     {
                         _ioExternalCommunication.LabelApplied(statusApply);
+
+                        ////////////// Controllo segnale impulsivo //////////////////////////////////////////////////////////////
+                        _areDigitalIOSignalsImpulsiveEnabled = await _viewModel.GetDigitalIOSignalsImpulsiveConfiguration();
+                        if (_areDigitalIOSignalsImpulsiveEnabled)
+                        {
+                            await Task.Run(ResetLabelApplied);
+                        }
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////
                     }
                 }
             }
@@ -235,6 +251,14 @@ public class Supervisor : IHostedService
             if (statusApply == OperationStatus.OK)
             {
                 _ioExternalCommunication.LabelApplied(statusApply);
+
+                ////////////// Controllo segnale impulsivo //////////////////////////////////////////////////////////////
+                bool _areDigitalIOSignalsImpulsiveEnabled = await _viewModel.GetDigitalIOSignalsImpulsiveConfiguration();
+                if (_areDigitalIOSignalsImpulsiveEnabled)
+                {
+                    await Task.Run(ResetLabelApplied);
+                }
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////
             }
             return;
         }
@@ -432,6 +456,13 @@ public class Supervisor : IHostedService
         var status = await _cycleService.ExecutePrintCycle(_viewModel.ActiveProductId, _currentSerialNumber, _activeOperativeModeId, _pendingLabelToPrint);
         _pendingLabelToPrint = string.Empty;
         _ioExternalCommunication.LabelPrinted(status);
+        ////////////// Controllo segnale impulsivo //////////////////////////////////////////////////////////////
+        bool _areDigitalIOSignalsImpulsiveEnabled = await _viewModel.GetDigitalIOSignalsImpulsiveConfiguration();
+        if (_areDigitalIOSignalsImpulsiveEnabled)
+        {
+            await Task.Run(ResetLabelPrinted);
+        }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
         return status == OperationStatus.OK;
     }
 
@@ -461,7 +492,16 @@ public class Supervisor : IHostedService
 
         var status = await _cycleService.ExecuteApplyCycle(_viewModel.ActiveProductId, _currentSerialNumber, _activeOperativeModeId);
         _pendingLabelToPrint = string.Empty;
+
         _ioExternalCommunication.LabelApplied(status);
+
+        ////////////// Controllo segnale impulsivo //////////////////////////////////////////////////////////////
+        bool _areDigitalIOSignalsImpulsiveEnabled = await _viewModel.GetDigitalIOSignalsImpulsiveConfiguration();
+        if (_areDigitalIOSignalsImpulsiveEnabled)
+        {
+            await Task.Run(ResetLabelApplied);
+        }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -469,5 +509,17 @@ public class Supervisor : IHostedService
         _robotService.Disconnect();
         _printerService.Disconnect();
         return Task.CompletedTask;
+    }
+
+    private async Task ResetLabelPrinted()
+    {
+        await Task.Delay(1000);
+        _robotService.SetDigitalOutput(DigitalOutputs.LabelPrinted, false);
+    }
+
+    private async Task ResetLabelApplied()
+    {
+        await Task.Delay(1000);
+        _robotService.SetDigitalOutput(DigitalOutputs.LabelApplied, false);
     }
 }

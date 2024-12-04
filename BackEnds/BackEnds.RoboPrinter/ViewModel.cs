@@ -274,7 +274,24 @@ public class ViewModel
             _semaphore.Release();
         }
     }
-    
+
+    public async Task<bool> GetDigitalIOSignalsImpulsiveConfiguration()
+    {
+        await _semaphore.WaitAsync();
+        try
+        {
+            var appSetting = await _context.AppSettings
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Description == "DigitalIOSignalsImpulsiveEnabled");
+
+            return Convert.ToBoolean(appSetting?.Value);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
     public async Task<bool> GetCycleConfiguration()
     {
         await _semaphore.WaitAsync();
@@ -967,6 +984,25 @@ public class ViewModel
         {
             var appSetting = await _context.AppSettings
                 .FirstOrDefaultAsync(x => x.Description == "DigitalIOSignalsEnabled");
+
+            if (appSetting is not null)
+            {
+                appSetting.Value = enabled.ToString();
+                await _context.SaveChangesAsync();
+            }
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+    public async Task SaveDigitalIOSignalsImpulsiveConfiguration(bool enabled)
+    {
+        await _semaphore.WaitAsync();
+        try
+        {
+            var appSetting = await _context.AppSettings
+                .FirstOrDefaultAsync(x => x.Description == "DigitalIOSignalsImpulsiveEnabled");
 
             if (appSetting is not null)
             {

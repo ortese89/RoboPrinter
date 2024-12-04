@@ -32,6 +32,7 @@ public class Controller
     private bool _useDigitalIO;
     private int _activeOperativeModeId = 0;
     private bool _areDigitalIOSignalsEnabled = false;
+    private bool _areDigitalIOSignalsImpulsiveEnabled = false;
     private bool _isExecuteEntireCycleEnabled = false;
     private string _manualSerialNumber = string.Empty;
     private RobotPosition? _applicationRouteHomePosition;
@@ -141,6 +142,11 @@ public class Controller
     {
         _areDigitalIOSignalsEnabled = await _viewModel.GetDigitalIOSignalsConfiguration();
         return _areDigitalIOSignalsEnabled;
+    }
+    public async Task<bool> AreDigitalIOSignalsImpulsiveEnabled()
+    {
+        _areDigitalIOSignalsImpulsiveEnabled = await _viewModel.GetDigitalIOSignalsImpulsiveConfiguration();
+        return _areDigitalIOSignalsImpulsiveEnabled;
     }
 
     public async Task<bool> IsExecuteEntireCycleEnabled()
@@ -369,10 +375,26 @@ public class Controller
         var status = await _cycleService.ExecutePrintCycle(productId, serialNumber, _activeOperativeModeId, string.Empty);
         _ioExternalCommunication.LabelPrinted(status);
 
+        ////////////// Controllo segnale impulsivo //////////////////////////////////////////////////////////////
+        bool _areDigitalIOSignalsImpulsiveEnabled = await _viewModel.GetDigitalIOSignalsImpulsiveConfiguration();
+        if (_areDigitalIOSignalsImpulsiveEnabled)
+        {
+            await Task.Run(ResetLabelPrinted);
+        }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         if (status == OperationStatus.OK)
         {
             status = await _cycleService.ExecuteApplyCycle(productId, serialNumber, _activeOperativeModeId);
             _ioExternalCommunication.LabelApplied(status);
+
+            ////////////// Controllo segnale impulsivo //////////////////////////////////////////////////////////////
+            _areDigitalIOSignalsImpulsiveEnabled = await _viewModel.GetDigitalIOSignalsImpulsiveConfiguration();
+            if (_areDigitalIOSignalsImpulsiveEnabled)
+            {
+                await Task.Run(ResetLabelApplied);
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////
         }
     }
 
@@ -515,7 +537,7 @@ public class Controller
         return _viewModel.RobotOverride;
     }
 
-    public async Task SaveSettings(int newOperativeModeId, bool digitalIOSignalsEnabled, bool executeEntireCycleEnabled)
+    public async Task SaveSettings(int newOperativeModeId, bool digitalIOSignalsEnabled, bool executeEntireCycleEnabled, bool digitalIOSignalsImpulsiveEnabled)
     {
         // Aggiorna le impostazioni nel sistema
         // Questa logica può includere la memorizzazione delle impostazioni in un database,
@@ -547,6 +569,12 @@ public class Controller
         {
             _areDigitalIOSignalsEnabled = digitalIOSignalsEnabled;
             await _viewModel.SaveDigitalIOSignalsConfiguration(_areDigitalIOSignalsEnabled);
+        }
+
+        if (_areDigitalIOSignalsImpulsiveEnabled != digitalIOSignalsImpulsiveEnabled)
+        {
+            _areDigitalIOSignalsImpulsiveEnabled = digitalIOSignalsImpulsiveEnabled;
+            await _viewModel.SaveDigitalIOSignalsImpulsiveConfiguration(_areDigitalIOSignalsImpulsiveEnabled);
         }
 
         if (_isExecuteEntireCycleEnabled != executeEntireCycleEnabled)
@@ -733,5 +761,15 @@ public class Controller
             }
         }
     }
+    private async Task ResetLabelPrinted()
+    {
+        await Task.Delay(1000);
+        _robotService.SetDigitalOutput(DigitalOutputs.LabelPrinted, false);
+    }
 
+    private async Task ResetLabelApplied()
+    {
+        await Task.Delay(1000);
+        _robotService.SetDigitalOutput(DigitalOutputs.LabelApplied, false);
+    }
 }
