@@ -190,60 +190,60 @@ class Dashboard : DobotClient
         return WaitReply(5000);
     }
 
-public async Task<string> DigitalOutputs(int index, bool status, bool swap)
-{
-    if (!IsConnected())
-    {
-        return "device is not connected!!!";
-    }
+//public async Task<string> DigitalOutputs(int index, bool status, bool swap)
+//{
+//    if (!IsConnected())
+//    {
+//        return "device is not connected!!!";
+//    }
 
-    if (!swap)
-    {
-        // Se swap è falso, invia il comando una sola volta e ritorna.
-        string str = String.Format("DO({0},{1})", index, status ? 1 : 0);
-        if (!SendData(str))
-        {
-            return str + ": send error";
-        }
-        return await WaitReplyAsync(5000);
-    }
-    else
-    {
-        // Se swap è vero e lo status è true, alterna lo stato ogni secondo.
-        bool currentStatus = status;
-        while (status)  // Continua solo se status è true
-        {
-            // Alterna lo stato logico
-            currentStatus = !currentStatus;
+//    if (!swap)
+//    {
+//        // Se swap è falso, invia il comando una sola volta e ritorna.
+//        string str = String.Format("DO({0},{1})", index, status ? 1 : 0);
+//        if (!SendData(str))
+//        {
+//            return str + ": send error";
+//        }
+//        return await WaitReplyAsync(5000);
+//    }
+//    else
+//    {
+//        // Se swap è vero e lo status è true, alterna lo stato ogni secondo.
+//        bool currentStatus = status;
+//        while (status)  // Continua solo se status è true
+//        {
+//            // Alterna lo stato logico
+//            currentStatus = !currentStatus;
 
-            // Invia il comando con il nuovo stato
-            string str = String.Format("DO({0},{1})", index, currentStatus ? 1 : 0);
-            if (!SendData(str))
-            {
-                return str + ": send error";
-            }
+//            // Invia il comando con il nuovo stato
+//            string str = String.Format("DO({0},{1})", index, currentStatus ? 1 : 0);
+//            if (!SendData(str))
+//            {
+//                return str + ": send error";
+//            }
 
-            // Attendi la risposta
-            string reply = await WaitReplyAsync(5000);
-            if (!reply.Contains("0,{},"))
-            {
-                return reply;  // Interrompe se la risposta non è corretta
-            }
+//            // Attendi la risposta
+//            string reply = await WaitReplyAsync(5000);
+//            if (!reply.Contains("0,{},"))
+//            {
+//                return reply;  // Interrompe se la risposta non è corretta
+//            }
 
-            // Attende 1 secondo prima di alternare nuovamente
-            await Task.Delay(5000);
-        }
+//            // Attende 1 secondo prima di alternare nuovamente
+//            await Task.Delay(5000);
+//        }
 
-        // Se status diventa false, resettare l'uscita
-        string resetStr = String.Format("DO({0},{1})", index, 0);
-        if (!SendData(resetStr))
-        {
-            return resetStr + ": send error";
-        }
+//        // Se status diventa false, resettare l'uscita
+//        string resetStr = String.Format("DO({0},{1})", index, 0);
+//        if (!SendData(resetStr))
+//        {
+//            return resetStr + ": send error";
+//        }
 
-        return await WaitReplyAsync(5000);
-    }
-}
+//        return await WaitReplyAsync(5000);
+//    }
+//}
 
 // Funzione asincrona per attendere la risposta con timeout
 private async Task<string> WaitReplyAsync(int timeoutMs)

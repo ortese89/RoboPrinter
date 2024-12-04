@@ -50,8 +50,6 @@ public class Controller
         _ioExternalCommunication = ioExternalCommunication;
         Task.Run(CheckHomePosition);
         _externalDeviceCommunication = externalDeviceCommunication;
-        MoveJog(JogMovement.X, true);
-        StopJog();
     }
 
     public async Task AddNewRouteStep(RouteStepDto routeStepDto)
@@ -645,9 +643,27 @@ public class Controller
         };
 
         _robotService.Load(parameters);
+
+        _logger.LogInformation("Check Robot...");
+
+        while (!_robotService.Status.Contains("Enabled"))
+        {
+            _robotService.FullReset();
+            await Task.Delay(3000);
+            _logger.LogInformation("Reset Robot...");
+        }
+
+        _logger.LogInformation("Robot resetted...");
+
         _robotService.SetSpeedRatio(_viewModel.RobotOverride);
         /////////////_robotService.SetUserFrame(0, 0, 0, 0, 0);
         ////////////_robotService.SetToolFrame(0, 0, 0, 0, 0);
+        ///
+        _logger.LogInformation("Start Jog Robot...");
+        _robotService.MoveJog(JogMovement.X, false);
+        await Task.Delay(50);
+        _robotService.StopJog();
+        _logger.LogInformation("Stop Jog Robot...");
     }
     
     public async Task SetRobotSpeed(int speed)

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using System.Net.NetworkInformation;
 using UseCases.core;
 using static System.Net.WebRequestMethods;
+using static UseCases.core.IRobotService;
 
 #endregion
 
@@ -92,9 +93,27 @@ public class Supervisor : IHostedService
         };
 
         _robotService.Load(parameters);
+
+        _logger.LogInformation("Check Robot...");
+
+        while (!_robotService.Status.Contains("Enabled"))
+        {
+            _robotService.FullReset();
+            await Task.Delay(3000);
+            _logger.LogInformation("Reset Robot...");
+        }
+
+        _logger.LogInformation("Robot resetted...");
+
         _robotService.SetSpeedRatio(_viewModel.RobotOverride);
         /////////////_robotService.SetUserFrame(0, 0, 0, 0, 0);
         ////////////_robotService.SetToolFrame(0, 0, 0, 0, 0);
+        ///
+        _logger.LogInformation("Start Jog Robot...");
+        _robotService.MoveJog(JogMovement.X, false);
+        await Task.Delay(50);
+        _robotService.StopJog();
+        _logger.LogInformation("Stop Jog Robot...");
     }
 
     private void InitializeExternalDevice()
@@ -245,7 +264,6 @@ public class Supervisor : IHostedService
             _logger.LogError("Failed to find a Product with Id or Description equal to: {Product}", product);
         }
     }
-
 
     private async void OnCSEPrintRequested(object? sender, EventArgs e)
     {
