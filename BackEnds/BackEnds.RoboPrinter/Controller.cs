@@ -12,6 +12,7 @@ using static UseCases.core.IRobotService;
 using System.Net.NetworkInformation;
 using BackEnds.RoboPrinter.Services;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json.Linq;
 
 #endregion
 
@@ -49,6 +50,7 @@ public class Controller
         _gpioManager = gpioManager;
         _ioExternalCommunication = ioExternalCommunication;
         Task.Run(CheckHomePosition);
+        Task.Run(ReadySignal);
         _externalDeviceCommunication = externalDeviceCommunication;
     }
 
@@ -402,11 +404,11 @@ public class Controller
             _robotService.SetDigitalOutput((int)DigitalOutputs.PrinterLowMaterial, false);
         }
 
-        if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
-        {
-			// Gestione segnale di ready
-			_robotService.SetDigitalOutput(DigitalOutputs.Ready, true, true);
-        }
+   //////////     if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
+   //////////     {
+			//////////// Gestione segnale di ready
+			//////////_robotService.SetDigitalOutput(DigitalOutputs.Ready, true, true);
+   //////////     }
 
         _robotService.SetSpeedRatio(_viewModel.RobotOverride);
     }
@@ -710,4 +712,26 @@ public class Controller
             await Task.Delay(1000);
         }
     }
+
+
+    private async Task ReadySignal()
+    {
+        if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
+        {
+            while (true)
+            {
+                var printerStatus = _printerService.GetStatus();
+                bool dobotError = _robotService.IsInError;
+                
+                if (!dobotError && (printerStatus == PrinterStatus.OK))
+                {
+                    bool currentStatus = _robotService.ReadDigitalOutput(DigitalOutputs.Ready);
+                    currentStatus = !currentStatus;
+                    _robotService.SetDigitalOutput(DigitalOutputs.Ready, currentStatus);
+                }
+                await Task.Delay(5000);
+            }
+        }
+    }
+
 }

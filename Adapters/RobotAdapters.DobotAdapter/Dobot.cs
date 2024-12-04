@@ -568,37 +568,37 @@ public class Dobot : IRobotService
 
         //await _dashboard.DigitalOutputs(index, value, swap);
 
-        if (!swap)
-        {
-            if (!_IsInError)
-            {
-                _dashboard.DigitalOutputs(index, value);
-            }
-        }
-        else
-        {
-            // Se swap è vero e lo status è true, alterna lo stato ogni secondo.
-            bool currentStatus = value;
-            while (value)  // Continua solo se status è true
-            {
-                // Alterna lo stato logico
-                currentStatus = !currentStatus;
+        //////////////////if (!swap)
+        //////////////////{
+        //////////////////    if (!_IsInError)
+        //////////////////    {
+        //////////////////        _dashboard.DigitalOutputs(index, value);
+        //////////////////    }
+        //////////////////}
+        //////////////////else
+        //////////////////{
+        //////////////////    // Se swap è vero e lo status è true, alterna lo stato ogni secondo.
+        //////////////////    bool currentStatus = value;
+        //////////////////    while (value)  // Continua solo se status è true
+        //////////////////    {
+        //////////////////        // Alterna lo stato logico
+        //////////////////        currentStatus = !currentStatus;
 
-                if (!_IsInError)
-                {
-                    _dashboard.DigitalOutputs(index, currentStatus);
-                }
+        //////////////////        if (!_IsInError)
+        //////////////////        {
+        //////////////////            _dashboard.DigitalOutputs(index, currentStatus);
+        //////////////////        }
 
-                // Attende 1 secondo prima di alternare nuovamente
-                await Task.Delay(5000);
-            }
+        //////////////////        // Attende 1 secondo prima di alternare nuovamente
+        //////////////////        await Task.Delay(5000);
+        //////////////////    }
 
-            // Se status diventa false, resettare l'uscita
-            if (!_IsInError)
-            {
-                _dashboard.DigitalOutputs(index, value);
-            }
-        }
+        //////////////////    // Se status diventa false, resettare l'uscita
+        //////////////////    if (!_IsInError)
+        //////////////////    {
+        //////////////////        _dashboard.DigitalOutputs(index, value);
+        //////////////////    }
+        //////////////////}
     }
 
     public void SetSpeedRatio(int value)
