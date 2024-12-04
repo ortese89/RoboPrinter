@@ -577,12 +577,17 @@ public class Controller
         await _viewModel.DeleteProduct(productId);
     }
 
-    public async Task Shutdown()
+    public async Task TurnOff()
     {
-       await ShutdownRobot();
+       await TurnOffRobot();
     }
 
-    private async Task ShutdownRobot()
+    public async Task TurnOn()
+    {
+        await TurnOnRobot();
+    }
+
+    private async Task TurnOffRobot()
     {
         bool isRobotInDebugMode = Convert.ToBoolean(_configuration["InternalDevices:Robot:DebugMode"]);
         if (isRobotInDebugMode) return;
@@ -608,6 +613,43 @@ public class Controller
         _logger.LogInformation("Robot shutdown!");
     }
 
+    private async Task TurnOnRobot()
+    {
+        bool isRobotInDebugMode = Convert.ToBoolean(_configuration["InternalDevices:Robot:DebugMode"]);
+        if (isRobotInDebugMode) return;
+        _logger.LogInformation("Supervisor - Initializing Robot...");
+
+        string robotIpAddress = _configuration["InternalDevices:Robot:IpAddress"] ?? string.Empty;
+        var ping = new Ping();
+
+        while (ping.Send(robotIpAddress).Status != IPStatus.Success)
+        {
+            _logger.LogInformation("Robot ping failed - Trying to turn it on with GPIO output...");
+            await Task.Delay(500);
+            _logger.LogInformation("Robot ping failed - Set Output to FALSE...");
+            _gpioManager.SetDigitalOutput(1, false);
+            await Task.Delay(500);
+            _logger.LogInformation("Robot ping failed - Set Output to TRUE...");
+            _gpioManager.SetDigitalOutput(1, true);
+            _logger.LogInformation("Robot ping failed - Waiting 10 sec...");
+            await Task.Delay(10000);
+        }
+
+        _logger.LogInformation("Connecting to Robot...");
+
+        _robotService.Connect(robotIpAddress, Convert.ToInt16(_configuration["InternalDevices:Robot:Port"]), isRobotInDebugMode);
+
+        var parameters = new Dictionary<string, string>
+        {
+            { "MOVEMENTTOLERANCE", _configuration["InternalDevices:Robot:MovementTolerance"] ?? "0" }
+        };
+
+        _robotService.Load(parameters);
+        _robotService.SetSpeedRatio(_viewModel.RobotOverride);
+        /////////////_robotService.SetUserFrame(0, 0, 0, 0, 0);
+        ////////////_robotService.SetToolFrame(0, 0, 0, 0, 0);
+    }
+    
     public async Task SetRobotSpeed(int speed)
     {
        _robotService.SetSpeedRatio(speed);

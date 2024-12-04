@@ -21,7 +21,7 @@
             logger.LogInformation("Confirmed Shutdown");
             try
             {
-                await controller.Shutdown();
+                await controller.TurnOff();
                 logger.LogInformation("Controller Shutdown");
                 logger.LogInformation("Shutting down computer...");
 
