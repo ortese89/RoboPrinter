@@ -772,4 +772,5 @@ public class Controller
         await Task.Delay(1000);
         _robotService.SetDigitalOutput(DigitalOutputs.LabelApplied, false);
     }
+
 }

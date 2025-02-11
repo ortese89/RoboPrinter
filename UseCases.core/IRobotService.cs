@@ -29,6 +29,8 @@ public interface IRobotService
     OperationStatus Load(Dictionary<string, string> parameters);
     OperationStatus MoveLinearToPosition(RobotPosition robotPosition);
     OperationStatus MoveLinearToPosition(RobotPosition robotPosition, int speed);
+
+    OperationStatus MoveLinearToPositionWForceControl(RobotPosition robotPosition, int speed);
     OperationStatus MoveToMultiplePositions(RobotPosition[] robotPositions);
     OperationStatus MoveJointToPosition(RobotPosition robotPosition);
     void ClearAlarms();

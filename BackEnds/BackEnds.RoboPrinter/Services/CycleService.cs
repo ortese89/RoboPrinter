@@ -21,6 +21,8 @@ public class CycleService : ICycleService
 	private readonly ViewModel _viewModel;
     private int _activeOperativeModeId = 0;
     private CancellationTokenSource _cts = new();
+    private CancellationTokenSource _ctsForce;
+    private double[] refForce = new double[6];
     public bool IsCycling { get;  set; } = false;
 
     public CycleService(ILogger<CycleService> logger, IRobotService robotService, IPrinterService printerService, ViewModel viewModel, IConfiguration configuration)
@@ -399,6 +401,7 @@ public class CycleService : ICycleService
 
     private async Task<OperationStatus> ApplyLabel(int productId)
     {
+        
         _logger.LogInformation("ApplyLabel starting on product: {ProductId}", productId);
         var stopwatch = Stopwatch.StartNew();
         OperationStatus status = OperationStatus.Error;
@@ -417,20 +420,90 @@ public class CycleService : ICycleService
                 foreach (var step in applicationRoute.Where(p => p.StepOrder <= applyPosition.StepOrder))
                 {
                     //_robotService.SetSpeedRatio(step.Speed);
-                    status = MoveToPosition(step);
+
+
+
+
+                    if (step.RobotPoint.PointType.Description.Contains("Application"))
+                    {
+                        //refForce = _robotService.GetRobotTCPForce();
+                        status = MoveToPositionWForceControl(step);
+                    }
+                    else
+                    {
+                        status = MoveToPosition(step);
+                    }
+
+
+
+
+
+
 
                     if (status != OperationStatus.OK)
                     {
                         _logger.LogInformation("ApplyLabel - Failed MoveToPosition");
                         return status;
                     }
+
+
+
+
+
+                    ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    //bool isForceControlEnabled = Convert.ToBoolean(_configuration["Application:Enabled"]);
+
+                    //if (isForceControlEnabled)
+                    //{
+                    //    _ctsForce = new();
+                    //    bool conditionMet = await Task.Run(() => ForceControl(_ctsForce.Token));
+                    //}
+
+                    //_ctsForce.Cancel();
+
+                    
+
+
+
+                    if (step.RobotPoint.PointType.Description.Contains("Application")) {
+
+
+                        bool isForceControlEnabled = Convert.ToBoolean(_configuration["Application:Enabled"]);
+                        _ctsForce = new();
+
+                        if (isForceControlEnabled)
+                        {
+                            bool conditionMet = await Task.Run(() => ForceControl(refForce, _ctsForce.Token));
+
+                            if (!conditionMet)
+                            {
+                                // Se la condizione è soddisfatta, prosegui l'esecuzione
+                                await Task.Delay(50);
+                                System.Diagnostics.Debug.WriteLine("Attesa check ForceControl");
+                            }
+                            else
+                            {
+                                _ctsForce.Cancel();
+                                _robotService.ResetAlarms();
+                                System.Diagnostics.Debug.WriteLine("ResetAlarms per bloccare il movimento di applicazione");
+                            }
+                        }
+                        ///////////////////////////////////////////////////////////////////////////////////////////////////
+                    }
+
+
+
                     if (Convert.ToBoolean(_configuration["DigitalOutputsEnabled"]))
                     {
                         _robotService.SetDigitalOutput(DigitalOutputs.Safe, step.ClearZone);
                     }
                     await _viewModel.SaveLastExecutedRouteStep(step.Id);
+
+
                 }
             }
+
+
 
             _robotService.SetDigitalOutput(DigitalOutputs.VacuumActivation, false);
             
@@ -488,6 +561,21 @@ public class CycleService : ICycleService
         };
 
         return _robotService.MoveLinearToPosition(robotPosition, step.Speed);
+    }
+
+    private OperationStatus MoveToPositionWForceControl(RouteStep step)
+    {
+        var robotPosition = new RobotPosition()
+        {
+            X = step.RobotPoint.X,
+            Y = step.RobotPoint.Y,
+            Z = step.RobotPoint.Z - 100,
+            Yaw = step.RobotPoint.Yaw,
+            Pitch = step.RobotPoint.Pitch,
+            Roll = step.RobotPoint.Roll
+        };
+
+        return _robotService.MoveLinearToPositionWForceControl(robotPosition, step.Speed);
     }
 
     private void MoveToPositions(RouteStep[] pickPositions)
@@ -654,6 +742,7 @@ public class CycleService : ICycleService
         //    per gestione segnale di ready   _robotService.SetDigitalOutput(DigitalOutputs.Ready, false, false);
 
         IsCycling = false;
+        _ctsForce.Cancel();
     }
 
     private async Task<bool> CheckHomePosition(RobotPosition rp)
@@ -696,5 +785,25 @@ public class CycleService : ICycleService
             }
         }
         return currentStepOrder;
+    }
+
+    private async Task<bool> ForceControl(double[] rForce, CancellationToken ct)
+    {
+        while (!ct.IsCancellationRequested)
+        {
+            double[] TForce = _robotService.GetRobotTCPForce();
+
+            for (int i = 0; i < 6; i++)
+            {
+                if (Math.Abs(TForce[i]) > Math.Abs(rForce[i]) + 2.00)
+
+                {
+                    return true;
+                }
+            }
+            await Task.Delay(50);
+        }
+
+        return false; // Se il ciclo si interrompe per la cancellazione, ritorna false
     }
 }

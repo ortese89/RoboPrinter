@@ -220,6 +220,15 @@ public class Dobot : IRobotService
         return (chrono.ElapsedMilliseconds < TimeoutMovement && !IsInError) ? OperationStatus.OK : OperationStatus.RobotMovementFailed;
     }
 
+    public OperationStatus MoveLinearToPositionWForceControl(RobotPosition robotPosition, int speed)
+    {
+        if (_debugMode) return OperationStatus.OK;
+
+        _dobotMove.MovL(robotPosition, speed);
+
+        return OperationStatus.OK;
+    }
+
     public OperationStatus MoveToMultiplePositions(RobotPosition[] robotPositions)
     {
         if (_debugMode) return OperationStatus.OK;
