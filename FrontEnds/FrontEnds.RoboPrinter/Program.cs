@@ -29,7 +29,7 @@ builder.Services.AddSingleton<UserData>();
 builder.Services.ConfigureBackendServices(builder.Configuration);
 
 var app = builder.Build();
-
+Log.Information("Test log - applicazione avviata");
 string[] supportedCultures = ["it-IT", "en-GB", "ar-AE"];
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
